@@ -9,7 +9,7 @@
 
 <html>
 <head>
-    <title>Профиль</title>
+    <title>Все операции</title>
 </head>
 <body>
 <div>
@@ -22,9 +22,13 @@
             <td>
                 <p>Тип актива</p></td>
             <td>
+                <p>Дата сделки</p></td>
+            <td>
+                <p>Покупка/Продажа</p></td>
+            <td>
                 <p>Брокер</p></td>
             <td>
-                <p>Кол-во активов</p></td>
+                <p>Цена сделки</p></td>
             <td>
                 <p>Привлекательность покупки</p></td>
             <td>
@@ -53,21 +57,25 @@
             var curUserId = int.Parse(Session["userId"].ToString());
             var operationsCurrentUser = operations.Where(o => o.UserId == curUserId);
         }
-        @foreach (var operationGroup in operationsCurrentUser.GroupBy(operation => operation.AssetName))
+        @foreach (var operation in operationsCurrentUser)
         {
-            var assetCount = operationGroup.Sum(operation => operation.Type);
             <tr>
                 <td>
-                    <p>@operationGroup.First().AssetName</p></td>
+                    <p>@operation.AssetName</p></td>
                 <td>
-                    <p>@operationGroup.First().AssetTicker</p></td>
+                    <p>@operation.AssetTicker</p></td>
                 <td>
-                    <p>@operationGroup.First().AssetType</p></td>
+                    <p>@operation.AssetType</p></td>
                 <td>
-                    <p>@brokers.First(broker => broker.Id == operationGroup.First().BrokerId).Name</p></td>
-                <td><p>@assetCount</p></td>
+                    <p>@operation.Datetime.ToString("dd.MM.yyyy")</p></td>
+                <td>
+                    <p>@(operation.Type == 1 ? "Покупка" : "Продажа")</p></td>
+                <td>
+                    <p>@brokers.First(broker => broker.Id == operation.BrokerId).Name</p></td>
+                <td>
+                    <p>@operation.Price</p></td>
                 @{
-                    var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operationGroup.First().AssetAnalyticId);
+                    var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operation.AssetAnalyticId);
                     <td>
                         <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</p></td>
                     <td>
@@ -79,8 +87,7 @@
     <a href="/Home/Operations">Операции</a>
     <a href="/Home/Posts">Посты</a><br/>
     <a href="/Home/News">Новости</a>
-    <a href="/Home/Analytics">Аналитика</a><br/>
-    <a href="/Home/AddAsset">Добавить актив</a>
+    <a href="/Home/Analytics">Аналитика</a>
 </div>
 </body>
 </html>

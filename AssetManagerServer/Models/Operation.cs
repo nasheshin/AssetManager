@@ -4,6 +4,25 @@ namespace AssetManagerServer.Models
 {
     public class Operation
     {
+        public Operation()
+        {
+            
+        }
+
+        public Operation(Operation operation)
+        {
+            Id = operation.Id;
+            AssetName = operation.AssetName;
+            AssetTicker = operation.AssetTicker;
+            AssetType = operation.AssetType;
+            Datetime = operation.Datetime;
+            Type = operation.Type;
+            Price = operation.Price;
+            UserId = operation.UserId;
+            BrokerId = operation.BrokerId;
+            AssetAnalyticId = operation.AssetAnalyticId;
+        }
+        
         public int Id { get; set; }
         public string AssetName { get; set; }
         public string AssetTicker { get; set; }

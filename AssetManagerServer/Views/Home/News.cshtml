@@ -1,0 +1,33 @@
+﻿@using AssetManagerServer.Models
+@model dynamic
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Новости</title>
+</head>
+<body>
+<div>
+    <div>
+        @{
+            var newsItems = new List<NewsItem>();
+            foreach (var newsItem in ViewBag.NewsItems)
+            {
+                newsItems.Add(new NewsItem(newsItem as NewsItem));
+            }
+        }
+        @foreach (var newsItem in newsItems)
+        {
+            <b>@newsItem.Header</b>
+            <b>@newsItem.Datetime.ToString("dd.MM.yyyy hh:mm:ss")</b><br/>
+            <p>@newsItem.Text</p>
+        }
+    </div>
+</div>
+</body>
+</html>

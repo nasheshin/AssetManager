@@ -1,0 +1,28 @@
+﻿@model dynamic
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Добавление актива</title>
+</head>
+<body>
+<div>
+    <h3>Invest Manager Inc.</h3>
+    <form method="post" action="">
+        Название актива: <input type="text" name="AssetName"/><br/><br/>
+        Тикер актива: <input type="text" name="AssetTicker"/><br/><br/>
+        Тип актива: <input type="text" name="AssetType"/><br/><br/>
+        Дата сделки: <input type="text" name="Datetime"/><br/><br/>
+        Цена сделки: <input type="text" name="Price"/><br/><br/>
+        Брокер: <input type="text" name="BrokerName"/><br/><br/>
+        Кол-во: <input type="text" name="Count"/><br/><br/>
+        <input type="submit" value="Добавить"/>
+    </form>
+</div>
+</body>
+</html>

@@ -129,6 +129,7 @@
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
+        <Compile Include="HelpObjects\RawOperationToAdd.cs" />
         <Compile Include="HelpObjects\RawUser.cs" />
         <Compile Include="Models\AssetAnalytic.cs" />
         <Compile Include="Models\Broker.cs" />
@@ -162,7 +163,12 @@
         <Content Include="Scripts\jquery.validate.unobtrusive.js" />
         <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
         <Content Include="Scripts\modernizr-2.8.3.js" />
+        <Content Include="Views\Home\AddAsset.cshtml" />
+        <Content Include="Views\Home\Analytics.cshtml" />
         <Content Include="Views\Home\Index.cshtml" />
+        <Content Include="Views\Home\News.cshtml" />
+        <Content Include="Views\Home\Operations.cshtml" />
+        <Content Include="Views\Home\Posts.cshtml" />
         <Content Include="Views\Home\Profile.cshtml" />
         <Content Include="Views\Home\Register.cshtml" />
         <Content Include="Web.config" />
@@ -180,6 +186,7 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="App_Data" />
+        <Folder Include="Utils" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="fonts\glyphicons-halflings-regular.woff2" />

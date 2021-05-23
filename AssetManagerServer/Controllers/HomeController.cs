@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
 using AssetManagerServer.Models;
@@ -26,9 +27,15 @@ namespace AssetManagerServer.Controllers
             var users = _database.Users;
             var matchedUsers = users.Where(curUser => curUser.Name == user.Name && curUser.Password == user.Password);
 
-            return matchedUsers.Any()
-                ? $"Успешно! <a href={'"' + "/Home/Profile" + '"'}>Войти в профиль</a>"
-                : $"Неправильный логин или пароль <a href={'"' + "/Home/Sign" + '"'}>Повторить вход</a>";
+            if (matchedUsers.Any())
+            {
+                Session["userId"] = matchedUsers.ToList()[0].Id;
+                return $"Успешно! <a href={'"' + "/Home/Profile" + '"'}>Войти в профиль</a>";
+            }
+            else
+            {
+                return $"Неправильный логин или пароль <a href={'"' + "/Home/Sign" + '"'}>Повторить вход</a>";
+            }
         }
 
         [HttpGet]
@@ -52,13 +59,9 @@ namespace AssetManagerServer.Controllers
             var brokers = _database.Brokers;
             var matchedBrokers = brokers.Where(curBroker => curBroker.Name == rawUser.BrokerName);
             if (!matchedBrokers.Any())
-            {
                 brokers.Add(new Broker { Name = rawUser.BrokerName });
-            }
 
-            _database.SaveChanges();
-
-            var brokerInDb = brokers.Where(broker => broker.Name == rawUser.BrokerName).ToList()[0];
+            var brokerInDb = brokers.Last();
             users.Add(new User {Name = rawUser.Name, Password = rawUser.Password, BrokerId = brokerInDb.Id});
 
             _database.SaveChanges();
@@ -67,10 +70,61 @@ namespace AssetManagerServer.Controllers
         }
 
         [HttpGet]
-        public ActionResult Profile()
+        public new ActionResult Profile()
         {
+            ViewBag.Operations = _database.Operations;
+            ViewBag.Brokers = _database.Brokers;
+            ViewBag.AssetAnalytics = _database.AssetAnalytics;
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult Operations()
+        {
+            ViewBag.Operations = _database.Operations;
+            ViewBag.Brokers = _database.Brokers;
+            ViewBag.AssetAnalytics = _database.AssetAnalytics;
             return View();
         }
         
+        [HttpGet]
+        public ActionResult Analytics()
+        {
+            ViewBag.AssetAnalytics = _database.AssetAnalytics;
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult Posts()
+        {
+            ViewBag.Posts = _database.Posts;
+            ViewBag.Users = _database.Users;
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult News()
+        {
+            ViewBag.NewsItems = _database.NewsItems;
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult AddAsset(int operationId = -1)
+        {
+            ViewBag.OperationId = operationId;
+            return View();
+        }
+
+        [HttpPost]
+        public string AddAsset(RawOperationToAdd rawOperation)
+        {
+            var (isValid, message) = rawOperation.Validate();
+            if (!isValid)
+                return $"{message} <a href={'"' + "/Home/AddAsset/" + ViewBag.OperationId + '"'}>Повторить регистрацию</a>";
+            
+            rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()));
+            return $"{message} <a href={'"' + "/Home/Profile" + '"'}>Вернуться к профилю</a>";
+        }
     }
 }

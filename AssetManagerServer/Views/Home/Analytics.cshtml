@@ -1,0 +1,52 @@
+﻿@using AssetManagerServer.Models
+@model dynamic
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Аналитика</title>
+</head>
+<body>
+<div>
+    <table>
+        
+        <tr>
+            <td>
+                <p>Актив</p></td>
+            <td>
+                <p>Привлекательность покупки</p></td>
+            <td>
+                <p>Привлекательность продажи</p></td>
+            <td></td>
+        </tr>
+        @{
+            var assetAnalytics = new List<AssetAnalytic>();
+            foreach (var analytic in ViewBag.AssetAnalytics)
+            {
+                assetAnalytics.Add(new AssetAnalytic(analytic as AssetAnalytic));
+            }
+        }
+        @foreach (var analytic in assetAnalytics)
+        {
+            <tr>
+                <td>
+                    <p>@analytic.AssetName</p></td>
+                <td>
+                    <p>@analytic.BuyRate</p></td>
+                <td>
+                    <p>@analytic.SellRate</p></td>
+            </tr>
+        }
+    </table>
+            <a href="/Home/Operations">Операции</a>
+            <a href="/Home/Posts">Посты</a><br/>
+            <a href="/Home/News">Новости</a>
+            <a href="/Home/Analytics">Аналитика</a>
+</div>
+</body>
+</html>
