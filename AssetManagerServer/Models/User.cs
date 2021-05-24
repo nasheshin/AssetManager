@@ -1,7 +1,20 @@
-﻿namespace AssetManagerServer.Models
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+
+namespace AssetManagerServer.Models
 {
     public class User
     {
+        public static List<User> GetUsersFromDbset(IEnumerable<User> dbsetUsers)
+        {
+            var users = new List<User>();
+            foreach (var user in dbsetUsers)
+            {
+                users.Add(new User((User) user));
+            }
+            return users;
+        }
+        
         public User()
         {
             

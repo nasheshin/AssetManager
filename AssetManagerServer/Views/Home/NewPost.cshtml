@@ -1,0 +1,22 @@
+﻿@model dynamic
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Новый пост</title>
+</head>
+<body>
+<div>
+    <form method="post" action="">
+        <input type="hidden" name="UserId" value="@int.Parse(Session["userId"].ToString())"/>;
+        <textarea name="Text" style="width:250px;height:150px;"></textarea>
+        <input type="submit" value="Отправить пост"/>
+    </form>
+</div>
+</body>
+</html>

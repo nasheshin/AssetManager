@@ -58,13 +58,13 @@
             var assetCount = operationGroup.Sum(operation => operation.Type);
             <tr>
                 <td>
-                    <p>@operationGroup.First().AssetName</p></td>
+                    <p>@(operationGroup.FirstOrDefault()?.AssetName)</p></td>
                 <td>
-                    <p>@operationGroup.First().AssetTicker</p></td>
+                    <p>@(operationGroup.FirstOrDefault()?.AssetTicker)</p></td>
                 <td>
-                    <p>@operationGroup.First().AssetType</p></td>
+                    <p>@(operationGroup.FirstOrDefault()?.AssetType)</p></td>
                 <td>
-                    <p>@brokers.First(broker => broker.Id == operationGroup.First().BrokerId).Name</p></td>
+                    <p>@(brokers.FirstOrDefault(broker => broker.Id == operationGroup.FirstOrDefault()?.BrokerId)?.Name)</p></td>
                 <td><p>@assetCount</p></td>
                 @{
                     var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operationGroup.First().AssetAnalyticId);
@@ -72,6 +72,10 @@
                         <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</p></td>
                     <td>
                         <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</p></td>
+                    <td>
+                        <a href="/Home/AddAsset?operationId=@(operationGroup.FirstOrDefault()?.Id)">Купить</a></td>
+                    <td>
+                        <a href="/Home/DeleteAsset?operationId=@(operationGroup.FirstOrDefault()?.Id)">Продать</a></td>
                 }
             </tr>
         }

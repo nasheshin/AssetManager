@@ -1,0 +1,21 @@
+﻿@model dynamic
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Подтвердите копирование</title>
+</head>
+<body>
+<div>
+    <form method="post" action="">
+        <input type="hidden" value="@ViewBag.OperationId" name="OperationId"/>
+        <input type="submit" value="Подтвердить копирование"/>
+    </form>
+</div>
+</body>
+</html>

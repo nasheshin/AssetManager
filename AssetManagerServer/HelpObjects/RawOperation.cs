@@ -4,8 +4,9 @@ using AssetManagerServer.Models;
 
 namespace AssetManagerServer.HelpObjects
 {
-    public class RawOperationToAdd
+    public class RawOperation
     {
+        public int OperationId { get; set; }
         public string AssetName { get; set; }
         public string AssetTicker { get; set; }
         public string AssetType { get; set; }
@@ -22,10 +23,10 @@ namespace AssetManagerServer.HelpObjects
                 return new Tuple<bool, string>(false, "Неккоректно введена цена сделки - проверьте не написали ли вы число через точку");
             if (!int.TryParse(Count, out _))
                 return new Tuple<bool, string>(false, "Неверно введено кол-во активо, которые необходимо добавить");
-            return new Tuple<bool, string>(true, "Актив был добавлен");
+            return new Tuple<bool, string>(true, "Действие было произведено успешно");
         }
 
-        public void SaveFormattedOperation(DataContext database, int userId)
+        public void SaveFormattedOperation(DataContext database, int userId, int type)
         {
             var assetNameLower = AssetName.ToLower();
             var brokerNameLower = BrokerName.ToLower();
@@ -42,7 +43,7 @@ namespace AssetManagerServer.HelpObjects
             if (assetAnalyticsMatched.Any())
                 assetAnalyticId = assetAnalyticsMatched.First().Id;
 
-            var brokerId = -1;
+            int brokerId;
             var brokerMatched = brokers.Where(broker => broker.Name.ToLower() == brokerNameLower);
             if (brokerMatched.Any())
                 brokerId = brokerMatched.First().Id;
@@ -57,7 +58,7 @@ namespace AssetManagerServer.HelpObjects
                 database.Operations.Add(new Operation
                 {
                     AssetName = AssetName, AssetTicker = AssetTicker, AssetType = AssetType, Datetime = datetimeParsed,
-                    Type = 1, Price = priceParsed, UserId = userId, BrokerId = brokerId,
+                    Type = type, Price = priceParsed, UserId = userId, BrokerId = brokerId,
                     AssetAnalyticId = assetAnalyticId
                 });
             }

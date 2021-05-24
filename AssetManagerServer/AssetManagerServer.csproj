@@ -129,7 +129,7 @@
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
-        <Compile Include="HelpObjects\RawOperationToAdd.cs" />
+        <Compile Include="HelpObjects\RawOperation.cs" />
         <Compile Include="HelpObjects\RawUser.cs" />
         <Compile Include="Models\AssetAnalytic.cs" />
         <Compile Include="Models\Broker.cs" />
@@ -165,7 +165,11 @@
         <Content Include="Scripts\modernizr-2.8.3.js" />
         <Content Include="Views\Home\AddAsset.cshtml" />
         <Content Include="Views\Home\Analytics.cshtml" />
+        <Content Include="Views\Home\CopyOperation.cshtml" />
+        <Content Include="Views\Home\DeleteAsset.cshtml" />
+        <Content Include="Views\Home\DeleteOperation.cshtml" />
         <Content Include="Views\Home\Index.cshtml" />
+        <Content Include="Views\Home\NewPost.cshtml" />
         <Content Include="Views\Home\News.cshtml" />
         <Content Include="Views\Home\Operations.cshtml" />
         <Content Include="Views\Home\Posts.cshtml" />

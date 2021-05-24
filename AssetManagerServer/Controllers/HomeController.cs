@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
@@ -16,25 +17,26 @@ namespace AssetManagerServer.Controllers
         }
 
         [HttpGet]
-        public ActionResult Sign()
+        public ActionResult Sign(string notifyMessage = "")
         {
+            ViewBag.NotifyMessage = notifyMessage;
             return View();
         }
         
         [HttpPost]
-        public string Sign(User user)
+        public ActionResult Sign(User user)
         {
-            var users = _database.Users;
-            var matchedUsers = users.Where(curUser => curUser.Name == user.Name && curUser.Password == user.Password);
+            var users = Models.User.GetUsersFromDbset(_database.Users);
+            var matchedUser = users.FirstOrDefault(curUser => curUser.Name == user.Name && curUser.Password == user.Password);
 
-            if (matchedUsers.Any())
+            if (matchedUser != null)
             {
-                Session["userId"] = matchedUsers.ToList()[0].Id;
-                return $"Успешно! <a href={'"' + "/Home/Profile" + '"'}>Войти в профиль</a>";
+                Session["userId"] = matchedUser.Id;
+                return Redirect("/Home/Profile");
             }
             else
             {
-                return $"Неправильный логин или пароль <a href={'"' + "/Home/Sign" + '"'}>Повторить вход</a>";
+                return Redirect("/Home/Sign?notifyMessage=Неправильный логин или пароль");
             }
         }
 
@@ -110,21 +112,115 @@ namespace AssetManagerServer.Controllers
         }
 
         [HttpGet]
-        public ActionResult AddAsset(int operationId = -1)
+        public ActionResult AddAsset(int operationId = -1, string notifyMessage = "")
+        {
+            ViewBag.NotifyMessage = notifyMessage;
+            ViewBag.OperationId = operationId;
+            ViewBag.Operations = _database.Operations;
+            ViewBag.Brokers = _database.Brokers;
+            return View();
+        }
+
+        [HttpPost]
+        public RedirectResult AddAsset(RawOperation rawOperation)
+        {
+            var (isValid, message) = rawOperation.Validate();
+            if (!isValid)
+                return Redirect($"/Home/AddAsset?operationId={rawOperation.OperationId}&notifyMessage={message}");
+            
+            rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()), 1);
+            return Redirect("/Home/Profile");
+        }
+
+        [HttpGet]
+        public ActionResult DeleteAsset(int operationId = -1, string notifyMessage = "")
+        {
+            ViewBag.NotifyMessage = notifyMessage;
+            ViewBag.OperationId = operationId;
+            ViewBag.Operations = _database.Operations;
+            ViewBag.Brokers = _database.Brokers;
+            return View();
+        }
+        
+        [HttpPost]
+        public ActionResult DeleteAsset(RawOperation rawOperation)
+        {
+            var (isValid, message) = rawOperation.Validate();
+            if (!isValid)
+                return Redirect($"/Home/AddAsset?operationId={rawOperation.OperationId}&notifyMessage={message}");
+            
+            rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()), -1);
+            return Redirect("/Home/Profile");
+        }
+        
+        [HttpGet]
+        public ActionResult CopyOperation(int operationId = -1)
         {
             ViewBag.OperationId = operationId;
             return View();
         }
 
         [HttpPost]
-        public string AddAsset(RawOperationToAdd rawOperation)
+        public string CopyOperation(RawOperation rawOperation)
         {
-            var (isValid, message) = rawOperation.Validate();
-            if (!isValid)
-                return $"{message} <a href={'"' + "/Home/AddAsset/" + ViewBag.OperationId + '"'}>Повторить регистрацию</a>";
+            var operations = new List<Operation>();
+            foreach (var o in _database.Operations)
+            {
+                operations.Add(new Operation(o as Operation));
+            }
+            var operationToCopy = operations.First(operation => operation.Id == rawOperation.OperationId);
+            _database.Operations.Add(operationToCopy);
+            _database.SaveChanges();
             
-            rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()));
-            return $"{message} <a href={'"' + "/Home/Profile" + '"'}>Вернуться к профилю</a>";
+            var message = "Успешное копирование";
+            return $"{message} <a href={'"' + "/Home/Operations" + '"'}>Вернуться к операциям</a>";
+        }
+        
+        [HttpGet]
+        public ActionResult DeleteOperation(int operationId = -1)
+        {
+            ViewBag.OperationId = operationId;
+            return View();
+        }
+        
+        [HttpPost]
+        public string DeleteOperation(RawOperation rawOperation)
+        {
+            Operation operationToDelete = null;
+            foreach (var o in _database.Operations)
+            {
+                if (o.Id != rawOperation.OperationId)
+                    continue;
+                
+                operationToDelete = o;
+            }
+
+            if (operationToDelete == null)
+                return $"Ошибка <a href={'"' + "/Home/Operations" + '"'}>Вернуться к операциям</a>";
+            
+            _database.Operations.Remove(operationToDelete);
+            _database.SaveChanges();
+            
+            var message = "Успешное удаление";
+            return $"{message} <a href={'"' + "/Home/Operations" + '"'}>Вернуться к операциям</a>";
+        }
+
+        [HttpGet]
+        public ActionResult NewPost()
+        {
+            ViewBag.Posts = _database.Posts;
+            return View();
+        }
+
+        [HttpPost]
+        public string NewPost(Post post)
+        {
+            post.Datetime = DateTime.Now;
+            _database.Posts.Add(post);
+            _database.SaveChanges();
+
+            var message = "Пост был успешно отправлен";
+            return $"{message} <a href={'"' + "/Home/Posts" + '"'}>Вернуться к постам</a>";
         }
     }
 }

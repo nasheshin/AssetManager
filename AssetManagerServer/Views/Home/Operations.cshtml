@@ -80,6 +80,10 @@
                         <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</p></td>
                     <td>
                         <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</p></td>
+                    <td>
+                        <a href="/Home/CopyOperation?operationId=@(operation.Id)">Копировать</a></td>
+                    <td>
+                        <a href="/Home/DeleteOperation?operationId=@(operation.Id)">Удалить</a></td>
                 }
             </tr>
         }

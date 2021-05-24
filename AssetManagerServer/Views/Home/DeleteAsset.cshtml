@@ -9,7 +9,7 @@
 
 <html>
 <head>
-    <title>Добавление актива</title>
+    <title>Удаление</title>
 </head>
 <body>
 <div>
@@ -21,7 +21,7 @@
             {
                 brokers.Add(new Broker(broker as Broker));
             }
-            
+
             Operation patternOperation;
             if (ViewBag.OperationId != -1)
             {
@@ -38,15 +38,15 @@
             }
         }
         <input type="hidden" name="OperationId" value="@(ViewBag.OperationId)"/>
-        Название актива: <input type="text" name="AssetName" value="@(patternOperation?.AssetName)"/><br/><br/>
-        Тикер актива: <input type="text" name="AssetTicker" value="@(patternOperation?.AssetTicker)"/><br/><br/>
-        Тип актива: <input type="text" name="AssetType" value="@(patternOperation?.AssetType)"/><br/><br/>
+        <input type="hidden" name="AssetName" value="@(patternOperation?.AssetName)"/>
+        <input type="hidden" name="AssetTicker" value="@(patternOperation?.AssetTicker)"/>
+        <input type="hidden" name="AssetType" value="@(patternOperation?.AssetType)"/>
+        <input type="hidden" name="BrokerName" value="@(brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)"/>
+        <b>Актив @(patternOperation?.AssetName)</b><br/><br/>
         Дата сделки: <input type="text" name="Datetime"/><br/><br/>
         Цена сделки: <input type="text" name="Price"/><br/><br/>
-        Брокер: <input type="text" name="BrokerName" value="@(brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)"/><br/><br/>
         Кол-во: <input type="text" name="Count"/><br/><br/>
-        <input type="submit" value="Добавить"/><br/>
-        <b>@(ViewBag.NotifyMessage)</b>
+        <input type="submit" value="Продать"/>
     </form>
 </div>
 </body>
