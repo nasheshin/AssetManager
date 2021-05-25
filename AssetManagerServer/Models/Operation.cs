@@ -1,9 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AssetManagerServer.Models
 {
     public class Operation
     {
+        public static IEnumerable<Operation> GetOperationsFromDbset(IEnumerable<Operation> dbsetOperations)
+        {
+            var operations = new List<Operation>();
+            foreach (var operation in dbsetOperations)
+            {
+                operations.Add(new Operation(operation));
+            }
+            return operations;
+        }
+        
         public Operation()
         {
             

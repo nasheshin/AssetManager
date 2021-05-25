@@ -1,4 +1,5 @@
-﻿@{
+﻿@model AssetManagerServer.Models.User
+@{
     Layout = null;
 }
  
@@ -12,12 +13,16 @@
 <body>
 <div>
     <h3>Invest Manager Inc.</h3>
-    <form method="post" action="">
-        Логин: <input type="text" name="Name"/><br/><br/>
-        Пароль: <input type="text" name="Password"/><br/><br/>
+    @using (Html.BeginForm("Sign", "Home", FormMethod.Post))
+    {
+        @Html.LabelFor(model => model.Name, "Логин:")
+        @Html.TextBoxFor(model => model.Name)<br/><br/>
+        @Html.LabelFor(model => model.Password, "Пароль:")
+        @Html.PasswordFor(model => model.Password)<br/><br/>
         <a href="/Home/Register/">Регистрация</a>
-        <input type="submit" value="Войти"/>
-    </form>
+        <input type="submit" value="Войти"/><br/>
+        <b>@(ViewBag.NotifyMessage)</b>
+    }
 </div>
 </body>
 </html>

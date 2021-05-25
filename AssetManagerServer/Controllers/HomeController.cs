@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
 using AssetManagerServer.Models;
+using AssetManagerServer.Utils;
 
 namespace AssetManagerServer.Controllers
 {
@@ -11,9 +12,11 @@ namespace AssetManagerServer.Controllers
     {
         private readonly DataContext _database = new DataContext();
         
+        private PrivacyValidator _privacyValidator = new PrivacyValidator();
+        
         public ActionResult Index()
         {
-            return View();
+            return Redirect("/Home/Sign");
         }
 
         [HttpGet]
@@ -36,39 +39,41 @@ namespace AssetManagerServer.Controllers
             }
             else
             {
-                return Redirect("/Home/Sign?notifyMessage=Неправильный логин или пароль");
+                return Redirect($"/Home/Sign?notifyMessage={Constants.Sign.WrongUsernameOrPassword}");
             }
         }
 
         [HttpGet]
-        public ActionResult Register()
+        public ActionResult Register(string notifyMessage = "")
         {
+            ViewBag.NotifyMessage = notifyMessage;
             return View();
         }
         
         [HttpPost]
-        public string Register(RawUser rawUser)
+        public ActionResult Register(RawUser rawUser)
         {
             if (rawUser.Password != rawUser.PasswordAgain)
-                return $"Пароли не совпадают <a href={'"' + "/Home/Register" + '"'}>Повторить регистрацию</a>";
-            
+                return Redirect($@"/Home/Register?notifyMessage={Constants.Register.WrongRepeatPassword}");
+
             var users = _database.Users;
             var matchedByNameUsers = users.Where(curUser => curUser.Name == rawUser.Name);
 
             if (matchedByNameUsers.Any())
-                return $"Данное имя занято <a href={'"' + "/Home/Register" + '"'}>Повторить регистрацию</a>";
+                return Redirect($@"/Home/Register?notifyMessage={Constants.Register.UsernameNotAvailable}");
             
             var brokers = _database.Brokers;
-            var matchedBrokers = brokers.Where(curBroker => curBroker.Name == rawUser.BrokerName);
-            if (!matchedBrokers.Any())
-                brokers.Add(new Broker { Name = rawUser.BrokerName });
+            var matchedBroker = brokers.FirstOrDefault(curBroker => curBroker.Name == rawUser.BrokerName);
+            if (matchedBroker == null)
+            {
+                matchedBroker = new Broker {Name = rawUser.BrokerName};
+                brokers.Add(matchedBroker);
+            }
 
-            var brokerInDb = brokers.Last();
-            users.Add(new User {Name = rawUser.Name, Password = rawUser.Password, BrokerId = brokerInDb.Id});
-
+            users.Add(new User {Name = rawUser.Name, Password = rawUser.Password, BrokerId = matchedBroker.Id});
             _database.SaveChanges();
 
-            return $"Регистрация прошла успешно <a href={'"' + "/Home/Sign" + '"'}>Вернуться к окну входа</a>";
+            return Redirect($@"/Home/Sign");
         }
 
         [HttpGet]
@@ -114,6 +119,9 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult AddAsset(int operationId = -1, string notifyMessage = "")
         {
+            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+                return HttpNotFound();
+            
             ViewBag.NotifyMessage = notifyMessage;
             ViewBag.OperationId = operationId;
             ViewBag.Operations = _database.Operations;
@@ -135,6 +143,9 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult DeleteAsset(int operationId = -1, string notifyMessage = "")
         {
+            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+                return HttpNotFound();
+            
             ViewBag.NotifyMessage = notifyMessage;
             ViewBag.OperationId = operationId;
             ViewBag.Operations = _database.Operations;
@@ -156,35 +167,40 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult CopyOperation(int operationId = -1)
         {
+            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+                return HttpNotFound();
+            
             ViewBag.OperationId = operationId;
             return View();
         }
 
         [HttpPost]
-        public string CopyOperation(RawOperation rawOperation)
+        public ActionResult CopyOperation(RawOperation rawOperation)
         {
             var operations = new List<Operation>();
             foreach (var o in _database.Operations)
             {
-                operations.Add(new Operation(o as Operation));
+                operations.Add(new Operation(o));
             }
             var operationToCopy = operations.First(operation => operation.Id == rawOperation.OperationId);
             _database.Operations.Add(operationToCopy);
             _database.SaveChanges();
             
-            var message = "Успешное копирование";
-            return $"{message} <a href={'"' + "/Home/Operations" + '"'}>Вернуться к операциям</a>";
+            return Redirect("/Home/Operations");
         }
         
         [HttpGet]
         public ActionResult DeleteOperation(int operationId = -1)
         {
+            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+                return HttpNotFound();
+            
             ViewBag.OperationId = operationId;
             return View();
         }
         
         [HttpPost]
-        public string DeleteOperation(RawOperation rawOperation)
+        public ActionResult DeleteOperation(RawOperation rawOperation)
         {
             Operation operationToDelete = null;
             foreach (var o in _database.Operations)
@@ -196,13 +212,12 @@ namespace AssetManagerServer.Controllers
             }
 
             if (operationToDelete == null)
-                return $"Ошибка <a href={'"' + "/Home/Operations" + '"'}>Вернуться к операциям</a>";
+                return Redirect("/Home/Operations");
             
             _database.Operations.Remove(operationToDelete);
             _database.SaveChanges();
             
-            var message = "Успешное удаление";
-            return $"{message} <a href={'"' + "/Home/Operations" + '"'}>Вернуться к операциям</a>";
+            return Redirect("/Home/Operations");
         }
 
         [HttpGet]
@@ -213,14 +228,13 @@ namespace AssetManagerServer.Controllers
         }
 
         [HttpPost]
-        public string NewPost(Post post)
+        public ActionResult NewPost(Post post)
         {
             post.Datetime = DateTime.Now;
             _database.Posts.Add(post);
             _database.SaveChanges();
-
-            var message = "Пост был успешно отправлен";
-            return $"{message} <a href={'"' + "/Home/Posts" + '"'}>Вернуться к постам</a>";
+            
+            return Redirect("/Home/Posts");
         }
     }
 }

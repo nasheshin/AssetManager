@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 
 namespace AssetManagerServer.Models
 {
     public class User
     {
-        public static List<User> GetUsersFromDbset(IEnumerable<User> dbsetUsers)
+        public static IEnumerable<User> GetUsersFromDbset(IEnumerable<User> dbsetUsers)
         {
             var users = new List<User>();
             foreach (var user in dbsetUsers)
             {
-                users.Add(new User((User) user));
+                users.Add(new User(user));
             }
             return users;
         }
@@ -30,6 +31,7 @@ namespace AssetManagerServer.Models
 
         public int Id { get; set; }
         public string Name { get; set; }
+        [DataType(DataType.Password)]
         public string Password { get; set; }
         public int BrokerId { get; set; }
     }
