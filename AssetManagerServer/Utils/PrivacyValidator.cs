@@ -5,7 +5,6 @@ namespace AssetManagerServer.Utils
 {
     public class PrivacyValidator
     {
-
         public PrivacyValidator()
         {
         }

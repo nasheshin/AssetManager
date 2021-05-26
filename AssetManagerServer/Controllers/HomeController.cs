@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
 using AssetManagerServer.Models;
 using AssetManagerServer.Utils;
+using Microsoft.Ajax.Utilities;
 
 namespace AssetManagerServer.Controllers
 {
@@ -79,6 +80,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public new ActionResult Profile()
         {
+            RedirectNotInitializedUser();
+            
             ViewBag.Operations = _database.Operations;
             ViewBag.Brokers = _database.Brokers;
             ViewBag.AssetAnalytics = _database.AssetAnalytics;
@@ -88,6 +91,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Operations()
         {
+            RedirectNotInitializedUser();
+            
             ViewBag.Operations = _database.Operations;
             ViewBag.Brokers = _database.Brokers;
             ViewBag.AssetAnalytics = _database.AssetAnalytics;
@@ -97,6 +102,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Analytics()
         {
+            RedirectNotInitializedUser();
+            
             ViewBag.AssetAnalytics = _database.AssetAnalytics;
             return View();
         }
@@ -104,6 +111,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Posts()
         {
+            RedirectNotInitializedUser();
+            
             ViewBag.Posts = _database.Posts;
             ViewBag.Users = _database.Users;
             return View();
@@ -112,6 +121,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult News()
         {
+            RedirectNotInitializedUser();
+            
             ViewBag.NewsItems = _database.NewsItems;
             return View();
         }
@@ -119,6 +130,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult AddAsset(int operationId = -1, string notifyMessage = "")
         {
+            RedirectNotInitializedUser();
+            
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
             
@@ -143,6 +156,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult DeleteAsset(int operationId = -1, string notifyMessage = "")
         {
+            RedirectNotInitializedUser();
+            
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
             
@@ -167,6 +182,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult CopyOperation(int operationId = -1)
         {
+            RedirectNotInitializedUser();
+            
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
             
@@ -192,6 +209,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult DeleteOperation(int operationId = -1)
         {
+            RedirectNotInitializedUser();
+            
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
             
@@ -223,6 +242,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult NewPost()
         {
+            RedirectNotInitializedUser();
+            
             ViewBag.Posts = _database.Posts;
             return View();
         }
@@ -235,6 +256,12 @@ namespace AssetManagerServer.Controllers
             _database.SaveChanges();
             
             return Redirect("/Home/Posts");
+        }
+
+        private void RedirectNotInitializedUser()
+        {
+            if (Session["userId"] == null)
+                Redirect("/Home/Sign");
         }
     }
 }

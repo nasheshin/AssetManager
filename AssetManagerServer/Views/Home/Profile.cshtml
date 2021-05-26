@@ -2,33 +2,39 @@
 @model dynamic
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!DOCTYPE html>
 
 <html>
 <head>
+    <link rel="stylesheet"
+              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
+              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+              crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Профиль</title>
 </head>
 <body>
 <div>
-    <table>
+    <table class="pure-table pure-table-bordered">
         <tr>
             <td>
-                <p>Актив</p></td>
+                <b>Актив</b></td>
             <td>
-                <p>Тикер актива</p></td>
+                <b>Тикер актива</b></td>
             <td>
-                <p>Тип актива</p></td>
+                <b>Тип актива</b></td>
             <td>
-                <p>Брокер</p></td>
+                <b>Брокер</b></td>
             <td>
-                <p>Кол-во активов</p></td>
+                <b>Кол-во активов</b></td>
             <td>
-                <p>Привлекательность покупки</p></td>
+                <b>Привлекательность покупки</b></td>
             <td>
-                <p>Привлекательность продажи</p></td>
+                <b>Привлекательность продажи</b></td>
+            <td></td>
             <td></td>
         </tr>
         @{
@@ -80,11 +86,6 @@
             </tr>
         }
     </table>
-    <a href="/Home/Operations">Операции</a>
-    <a href="/Home/Posts">Посты</a><br/>
-    <a href="/Home/News">Новости</a>
-    <a href="/Home/Analytics">Аналитика</a><br/>
-    <a href="/Home/AddAsset">Добавить актив</a>
 </div>
 </body>
 </html>

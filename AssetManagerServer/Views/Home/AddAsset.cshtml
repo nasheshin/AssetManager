@@ -2,19 +2,24 @@
 @model dynamic
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!DOCTYPE html>
 
 <html>
 <head>
+    <link rel="stylesheet"
+              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
+              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+              crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Добавление актива</title>
 </head>
 <body>
 <div>
     <h3>Invest Manager Inc.</h3>
-    <form method="post" action="">
+    <form method="post" action="" class="pure-form pure-form-aligned">
         @{
             var brokers = new List<Broker>();
             foreach (var broker in ViewBag.Brokers)
@@ -37,16 +42,17 @@
                 patternOperation = null;
             }
         }
-        <input type="hidden" name="OperationId" value="@(ViewBag.OperationId)"/>
-        Название актива: <input type="text" name="AssetName" value="@(patternOperation?.AssetName)"/><br/><br/>
-        Тикер актива: <input type="text" name="AssetTicker" value="@(patternOperation?.AssetTicker)"/><br/><br/>
-        Тип актива: <input type="text" name="AssetType" value="@(patternOperation?.AssetType)"/><br/><br/>
-        Дата сделки: <input type="text" name="Datetime"/><br/><br/>
-        Цена сделки: <input type="text" name="Price"/><br/><br/>
-        Брокер: <input type="text" name="BrokerName" value="@(brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)"/><br/><br/>
-        Кол-во: <input type="text" name="Count"/><br/><br/>
-        <input type="submit" value="Добавить"/><br/>
-        <b>@(ViewBag.NotifyMessage)</b>
+        <fieldset>
+            <input type="hidden" name="OperationId" value="@(ViewBag.OperationId)"/>
+            @Helpers.TextBoxPureStyled("AssetName", "Название актива", @patternOperation?.AssetName)
+            @Helpers.TextBoxPureStyled("AssetTicker", "Тикер актива", @patternOperation?.AssetTicker)
+            @Helpers.TextBoxPureStyled("AssetType", "Тип актива", @patternOperation?.AssetType)
+            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки")
+            @Helpers.TextBoxPureStyled("Price", "Цена сделки")
+            @Helpers.TextBoxPureStyled("BrokerName", "Брокер", @brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)
+            @Helpers.TextBoxPureStyled("Count", "Кол-во")
+            @Helpers.ConfirmButtonPureStyled("Добавить операцию покупки", @ViewBag.NotifyMessage)
+        </fieldset>
     </form>
 </div>
 </body>

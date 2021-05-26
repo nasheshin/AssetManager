@@ -1,0 +1,15 @@
+﻿@helper TextBoxPureStyled(string name, string label, string value = "", string type = "text")
+{
+    <div class="pure-control-group">
+        <label for="@name">@label</label>
+        <input type="@type" name="@name" placeholder="@label" value="@value"/>
+    </div>
+}
+
+@helper ConfirmButtonPureStyled(string buttonName, string notifyMessage)
+{
+    <div class="pure-controls">
+        <button type="submit" class="pure-button pure-button-primary">@buttonName</button><br/>
+        <label>@(notifyMessage)</label>
+    </div>
+}

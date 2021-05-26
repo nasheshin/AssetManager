@@ -1,28 +1,29 @@
-﻿@model AssetManagerServer.Models.User
-@{
-    Layout = null;
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
  
 <!DOCTYPE html>
  
 <html>
 <head>
-    <meta name="viewport" content="width=device-width"/>
+    <link rel="stylesheet"
+          href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
+          integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+          crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Вход</title>
 </head>
 <body>
 <div>
     <h3>Invest Manager Inc.</h3>
-    @using (Html.BeginForm("Sign", "Home", FormMethod.Post))
-    {
-        @Html.LabelFor(model => model.Name, "Логин:")
-        @Html.TextBoxFor(model => model.Name)<br/><br/>
-        @Html.LabelFor(model => model.Password, "Пароль:")
-        @Html.PasswordFor(model => model.Password)<br/><br/>
-        <a href="/Home/Register/">Регистрация</a>
-        <input type="submit" value="Войти"/><br/>
-        <b>@(ViewBag.NotifyMessage)</b>
-    }
+    <form method="post" action="" class="pure-form pure-form-aligned">
+        <fieldset>
+            @Helpers.TextBoxPureStyled("Name", "Логин")
+            @Helpers.TextBoxPureStyled("Password", "Пароль", "", "password")
+            @Helpers.ConfirmButtonPureStyled("Войти", @ViewBag.NotifyMessage)
+            <a href="/Home/Register/">Регистрация</a>
+        </fieldset>
+    </form>
 </div>
 </body>
 </html>

@@ -2,38 +2,35 @@
 @model dynamic
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!DOCTYPE html>
 
 <html>
 <head>
+    <link rel="stylesheet"
+              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
+              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+              crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Все операции</title>
 </head>
 <body>
 <div>
-    <table>
+    <table class="pure-table pure-table-bordered">
         <tr>
-            <td>
-                <p>Актив</p></td>
-            <td>
-                <p>Тикер актива</p></td>
-            <td>
-                <p>Тип актива</p></td>
-            <td>
-                <p>Дата сделки</p></td>
-            <td>
-                <p>Покупка/Продажа</p></td>
-            <td>
-                <p>Брокер</p></td>
-            <td>
-                <p>Цена сделки</p></td>
-            <td>
-                <p>Привлекательность покупки</p></td>
-            <td>
-                <p>Привлекательность продажи</p></td>
-            <td></td>
+            <th>Актив</th>
+            <th>Тикер актива</th>
+            <th>Тип актива</th>
+            <th>Дата сделки</th>
+            <th>Покупка/Продажа</th>
+            <th>Брокер</th>
+            <th>Цена сделки</th>
+            <th>Привлекательность покупки</th>
+            <th>Привлекательность продажи</th>
+            <th></th>
+            <th></th>
         </tr>
         @{
             var operations = new List<Operation>();
@@ -59,39 +56,22 @@
         }
         @foreach (var operation in operationsCurrentUser)
         {
+            var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operation.AssetAnalyticId);
             <tr>
-                <td>
-                    <p>@operation.AssetName</p></td>
-                <td>
-                    <p>@operation.AssetTicker</p></td>
-                <td>
-                    <p>@operation.AssetType</p></td>
-                <td>
-                    <p>@operation.Datetime.ToString("dd.MM.yyyy")</p></td>
-                <td>
-                    <p>@(operation.Type == 1 ? "Покупка" : "Продажа")</p></td>
-                <td>
-                    <p>@brokers.First(broker => broker.Id == operation.BrokerId).Name</p></td>
-                <td>
-                    <p>@operation.Price</p></td>
-                @{
-                    var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operation.AssetAnalyticId);
-                    <td>
-                        <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</p></td>
-                    <td>
-                        <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</p></td>
-                    <td>
-                        <a href="/Home/CopyOperation?operationId=@(operation.Id)">Копировать</a></td>
-                    <td>
-                        <a href="/Home/DeleteOperation?operationId=@(operation.Id)">Удалить</a></td>
-                }
+                <td>@operation.AssetName</td>
+                <td>@operation.AssetTicker</td>
+                <td>@operation.AssetType</td>
+                <td>@operation.Datetime.ToString("dd.MM.yyyy")</td>
+                <td>@(operation.Type == 1 ? "Покупка" : "Продажа")</td>
+                <td>@brokers.First(broker => broker.Id == operation.BrokerId).Name</td>
+                <td>@operation.Price</td>
+                <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</td>
+                <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</td>
+                <td><a href="/Home/CopyOperation?operationId=@(operation.Id)">Копировать</a></td>
+                <td><a href="/Home/DeleteOperation?operationId=@(operation.Id)">Удалить</a></td>
             </tr>
         }
     </table>
-    <a href="/Home/Operations">Операции</a>
-    <a href="/Home/Posts">Посты</a><br/>
-    <a href="/Home/News">Новости</a>
-    <a href="/Home/Analytics">Аналитика</a>
 </div>
 </body>
 </html>
