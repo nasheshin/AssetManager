@@ -8,31 +8,20 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Новости</title>
-</head>
 <body>
 <div>
-    <div>
+    <table class="pure-table" id="screenCenter">
         @{
-            var newsItems = new List<NewsItem>();
+            var i = 0;
             foreach (var newsItem in ViewBag.NewsItems)
             {
-                newsItems.Add(new NewsItem(newsItem as NewsItem));
+                <tr class="@(i == 0 ? "pure-table-odd" : "")">
+                    @Helpers.SocialWebElement(newsItem.Header, newsItem.Datetime, newsItem.Text)
+                </tr>
+                i++;
             }
         }
-        @foreach (var newsItem in newsItems)
-        {
-            <b>@newsItem.Header</b>
-            <b>@newsItem.Datetime.ToString("dd.MM.yyyy hh:mm:ss")</b><br/>
-            <p>@newsItem.Text</p>
-        }
-    </div>
+    </table>
 </div>
 </body>
 </html>

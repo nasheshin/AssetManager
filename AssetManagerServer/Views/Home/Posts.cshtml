@@ -1,4 +1,6 @@
-﻿@using AssetManagerServer.Models
+﻿@using System.Data.Entity
+@using AssetManagerServer.Models
+@using AssetManagerServer.Utils
 @model dynamic
 
 @{
@@ -8,36 +10,35 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Посты</title>
-</head>
 <body>
 <div>
-    <a href="/Home/NewPost/">Создать пост</a>
-    <div>
+    <table class="pure-table" id="screenCenter">
         @{
-            var posts = new List<Post>();
+            var users = (ViewBag.Users as DbSet<User>)?.ToList();
+            
+            if (users == null)
+            {
+                throw new NullReferenceException(Constants.Exceptions.NullListGot);
+            }
+            
+            var i = 0;
             foreach (var post in ViewBag.Posts)
             {
-                posts.Add(new Post(post as Post));
-            }
-            var users = new List<User>();
-            foreach (var user in ViewBag.Users)
-            {
-                users.Add(new User(user as User));
+                <tr class="@(i == 0 ? "pure-table-odd" : "")">
+                    @Helpers.SocialWebElement(users.First(user => user.Id == post.UserId).Name, post.Datetime, post.Text)
+                </tr>
+                i++;
             }
         }
-        @foreach (var post in posts)
-        {
-            <b>@users.First(user => user.Id == post.UserId).Name</b>
-            <b>@post.Datetime.ToString("dd.MM.yyyy hh:mm:ss")</b><br/>
-            <p>@post.Text</p>
-        }
+    </table>
+    <div>
+        <form method="post" action="" class="pure-form">
+            <fieldset>
+                <input type="hidden" name="UserId" value="@int.Parse(Session["userId"].ToString())"/>;
+                <textarea name="Text" style="width:250px;height:150px;">Писать тут...</textarea><br/>
+                @Helpers.ConfirmButtonPureStyled("Опубликовать", "")
+            </fieldset>
+        </form>
     </div>
 </div>
 </body>

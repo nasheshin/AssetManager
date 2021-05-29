@@ -1,4 +1,6 @@
-﻿@using AssetManagerServer.Models
+﻿@using System.Data.Entity
+@using AssetManagerServer.Models
+@using AssetManagerServer.Utils
 @model dynamic
 
 @{
@@ -8,17 +10,9 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Все операции</title>
-</head>
 <body>
 <div>
-    <table class="pure-table pure-table-bordered">
+    <table class="pure-table pure-table-bordered" id="screenCenter">
         <tr>
             <th>Актив</th>
             <th>Тикер актива</th>
@@ -33,43 +27,34 @@
             <th></th>
         </tr>
         @{
-            var operations = new List<Operation>();
-            foreach (var o in ViewBag.Operations)
-            {
-                operations.Add(new Operation(o as Operation));
-            }
+            var operations = (ViewBag.Operations as DbSet<Operation>)?.ToList();
+            var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
+            var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList();
 
-            var brokers = new List<Broker>();
-            foreach (var broker in ViewBag.Brokers)
+            if (operations == null || brokers == null || assetAnalytics == null)
             {
-                brokers.Add(new Broker(broker as Broker));
-            }
-
-            var assetAnalytics = new List<AssetAnalytic>();
-            foreach (var analytic in ViewBag.AssetAnalytics)
-            {
-                assetAnalytics.Add(new AssetAnalytic(analytic as AssetAnalytic));
+                throw new NullReferenceException(Constants.Exceptions.NullListGot);
             }
 
             var curUserId = int.Parse(Session["userId"].ToString());
             var operationsCurrentUser = operations.Where(o => o.UserId == curUserId);
-        }
-        @foreach (var operation in operationsCurrentUser)
-        {
-            var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operation.AssetAnalyticId);
-            <tr>
-                <td>@operation.AssetName</td>
-                <td>@operation.AssetTicker</td>
-                <td>@operation.AssetType</td>
-                <td>@operation.Datetime.ToString("dd.MM.yyyy")</td>
-                <td>@(operation.Type == 1 ? "Покупка" : "Продажа")</td>
-                <td>@brokers.First(broker => broker.Id == operation.BrokerId).Name</td>
-                <td>@operation.Price</td>
-                <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</td>
-                <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</td>
-                <td><a href="/Home/CopyOperation?operationId=@(operation.Id)">Копировать</a></td>
-                <td><a href="/Home/DeleteOperation?operationId=@(operation.Id)">Удалить</a></td>
-            </tr>
+            foreach (var operation in operationsCurrentUser)
+            {
+                var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operation.AssetAnalyticId);
+                <tr>
+                    <td>@operation.AssetName</td>
+                    <td>@operation.AssetTicker</td>
+                    <td>@operation.AssetType</td>
+                    <td>@operation.Datetime.ToString("dd.MM.yyyy")</td>
+                    <td>@(operation.Type == 1 ? "Покупка" : "Продажа")</td>
+                    <td>@brokers.First(broker => broker.Id == operation.BrokerId).Name</td>
+                    <td>@operation.Price</td>
+                    <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</td>
+                    <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</td>
+                    <td><a href="/Home/CopyOperation?operationId=@(operation.Id)">Копировать</a></td>
+                    <td><a href="/Home/DeleteOperation?operationId=@(operation.Id)">Удалить</a></td>
+                </tr>
+            }
         }
     </table>
 </div>

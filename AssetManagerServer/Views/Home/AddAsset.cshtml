@@ -1,4 +1,6 @@
-﻿@using AssetManagerServer.Models
+﻿@using System.Data.Entity
+@using AssetManagerServer.Models
+@using AssetManagerServer.Utils
 @model dynamic
 
 @{
@@ -8,39 +10,19 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Добавление актива</title>
-</head>
 <body>
 <div>
-    <h3>Invest Manager Inc.</h3>
-    <form method="post" action="" class="pure-form pure-form-aligned">
+    <form method="post" action="" class="pure-form pure-form-aligned" id="screenCenter">
         @{
-            var brokers = new List<Broker>();
-            foreach (var broker in ViewBag.Brokers)
-            {
-                brokers.Add(new Broker(broker as Broker));
-            }
+            var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
             
-            Operation patternOperation;
-            if (ViewBag.OperationId != -1)
+            if (brokers == null)
             {
-                var operations = new List<Operation>();
-                foreach (var o in ViewBag.Operations)
-                {
-                    operations.Add(new Operation(o as Operation));
-                }
-                patternOperation = operations.FirstOrDefault(operation => operation.Id == ViewBag.OperationId);
+                throw new NullReferenceException(Constants.Exceptions.NullListGot);
             }
-            else
-            {
-                patternOperation = null;
-            }
+
+            var patternOperation = ViewBag.OperationId == -1
+                ? null : (ViewBag.Operations as DbSet<Operation>)?.FirstOrDefault(operation => operation.Id == ViewBag.OperationId);
         }
         <fieldset>
             <input type="hidden" name="OperationId" value="@(ViewBag.OperationId)"/>
@@ -51,7 +33,7 @@
             @Helpers.TextBoxPureStyled("Price", "Цена сделки")
             @Helpers.TextBoxPureStyled("BrokerName", "Брокер", @brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)
             @Helpers.TextBoxPureStyled("Count", "Кол-во")
-            @Helpers.ConfirmButtonPureStyled("Добавить операцию покупки", @ViewBag.NotifyMessage)
+            @Helpers.ConfirmButtonPureStyled("Купить", @ViewBag.NotifyMessage)
         </fieldset>
     </form>
 </div>

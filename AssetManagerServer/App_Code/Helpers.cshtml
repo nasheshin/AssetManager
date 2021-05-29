@@ -13,3 +13,12 @@
         <label>@(notifyMessage)</label>
     </div>
 }
+
+@helper SocialWebElement(string header, DateTime datetime, string text)
+{
+    <td>
+        <b>@header</b>
+        <b>@datetime</b><br/>
+        <p>@text</p>
+    </td>
+}

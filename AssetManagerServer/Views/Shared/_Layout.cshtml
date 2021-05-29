@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8"/>
     <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
+          href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
+          integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+          crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="../../Content/Common.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>Invest Manager Inc.</title>
 </head>
 <body>
 <div class="pure-menu pure-menu-horizontal">
+    <a href="/Home/Profile" class="pure-menu-heading pure-menu-link">Invest Manager Inc.</a>
     @if (Session["userId"] != null)
     {
-        <a href="/Home/Profile" class="pure-menu-heading pure-menu-link">IMI</a>
         <ul class="pure-menu-list">
             <li class="pure-menu-item">
                 <a href="/Home/Operations" class="pure-menu-link">Операции</a>

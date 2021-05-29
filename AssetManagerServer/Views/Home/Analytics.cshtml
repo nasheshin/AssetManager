@@ -1,4 +1,6 @@
-﻿@using AssetManagerServer.Models
+﻿@using System.Data.Entity
+@using AssetManagerServer.Models
+@using AssetManagerServer.Utils
 @model dynamic
 
 @{
@@ -8,50 +10,32 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Аналитика</title>
-</head>
 <body>
 <div>
-    <table>
-        
+    <table class="pure-table pure-table-bordered" id="screenCenter">
         <tr>
-            <td>
-                <p>Актив</p></td>
-            <td>
-                <p>Привлекательность покупки</p></td>
-            <td>
-                <p>Привлекательность продажи</p></td>
-            <td></td>
+            <th>Актив</th>
+            <th>Привлекательность покупки</th>
+            <th>Привлекательность продажи</th>
         </tr>
         @{
-            var assetAnalytics = new List<AssetAnalytic>();
-            foreach (var analytic in ViewBag.AssetAnalytics)
+            var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList();
+
+            if (assetAnalytics == null)
             {
-                assetAnalytics.Add(new AssetAnalytic(analytic as AssetAnalytic));
+                throw new NullReferenceException(Constants.Exceptions.NullListGot);
+            }
+
+            foreach (var analytic in assetAnalytics)
+            {
+                <tr>
+                    <td>@analytic.AssetName</td>
+                    <td>@analytic.BuyRate</td>
+                    <td>@analytic.SellRate</td>
+                </tr>
             }
         }
-        @foreach (var analytic in assetAnalytics)
-        {
-            <tr>
-                <td>
-                    <p>@analytic.AssetName</p></td>
-                <td>
-                    <p>@analytic.BuyRate</p></td>
-                <td>
-                    <p>@analytic.SellRate</p></td>
-            </tr>
-        }
     </table>
-            <a href="/Home/Operations">Операции</a>
-            <a href="/Home/Posts">Посты</a><br/>
-            <a href="/Home/News">Новости</a>
-            <a href="/Home/Analytics">Аналитика</a>
 </div>
 </body>
 </html>

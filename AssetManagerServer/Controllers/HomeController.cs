@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
 using AssetManagerServer.Models;
 using AssetManagerServer.Utils;
-using Microsoft.Ajax.Utilities;
 
 namespace AssetManagerServer.Controllers
 {
@@ -30,8 +29,7 @@ namespace AssetManagerServer.Controllers
         [HttpPost]
         public ActionResult Sign(User user)
         {
-            var users = Models.User.GetUsersFromDbset(_database.Users);
-            var matchedUser = users.FirstOrDefault(curUser => curUser.Name == user.Name && curUser.Password == user.Password);
+            var matchedUser = _database.Users.FirstOrDefault(curUser => curUser.Name == user.Name && curUser.Password == user.Password);
 
             if (matchedUser != null)
             {
@@ -80,7 +78,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public new ActionResult Profile()
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             ViewBag.Operations = _database.Operations;
             ViewBag.Brokers = _database.Brokers;
@@ -91,7 +90,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Operations()
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             ViewBag.Operations = _database.Operations;
             ViewBag.Brokers = _database.Brokers;
@@ -102,7 +102,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Analytics()
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             ViewBag.AssetAnalytics = _database.AssetAnalytics;
             return View();
@@ -111,17 +112,29 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Posts()
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             ViewBag.Posts = _database.Posts;
             ViewBag.Users = _database.Users;
             return View();
         }
 
+        [HttpPost]
+        public ActionResult Posts(Post post)
+        {
+            post.Datetime = DateTime.Now;
+            _database.Posts.Add(post);
+            _database.SaveChanges();
+            
+            return Redirect("/Home/Posts");
+        }
+
         [HttpGet]
         public ActionResult News()
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             ViewBag.NewsItems = _database.NewsItems;
             return View();
@@ -130,7 +143,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult AddAsset(int operationId = -1, string notifyMessage = "")
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
@@ -156,7 +170,8 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult DeleteAsset(int operationId = -1, string notifyMessage = "")
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
@@ -182,86 +197,38 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult CopyOperation(int operationId = -1)
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
             
-            ViewBag.OperationId = operationId;
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult CopyOperation(RawOperation rawOperation)
-        {
-            var operations = new List<Operation>();
-            foreach (var o in _database.Operations)
-            {
-                operations.Add(new Operation(o));
-            }
-            var operationToCopy = operations.First(operation => operation.Id == rawOperation.OperationId);
+            var operations = _database.Operations.ToList();
+            var operationToCopy = operations.First(operation => operation.Id == operationId);
             _database.Operations.Add(operationToCopy);
             _database.SaveChanges();
             
             return Redirect("/Home/Operations");
         }
-        
+
         [HttpGet]
         public ActionResult DeleteOperation(int operationId = -1)
         {
-            RedirectNotInitializedUser();
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
             
             if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
                 return HttpNotFound();
             
-            ViewBag.OperationId = operationId;
-            return View();
-        }
-        
-        [HttpPost]
-        public ActionResult DeleteOperation(RawOperation rawOperation)
-        {
-            Operation operationToDelete = null;
-            foreach (var o in _database.Operations)
-            {
-                if (o.Id != rawOperation.OperationId)
-                    continue;
-                
-                operationToDelete = o;
-            }
+            var operationToDelete = _database.Operations.FirstOrDefault(o => o.Id == operationId);
 
             if (operationToDelete == null)
-                return Redirect("/Home/Operations");
+                return HttpNotFound();
             
             _database.Operations.Remove(operationToDelete);
             _database.SaveChanges();
             
             return Redirect("/Home/Operations");
-        }
-
-        [HttpGet]
-        public ActionResult NewPost()
-        {
-            RedirectNotInitializedUser();
-            
-            ViewBag.Posts = _database.Posts;
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult NewPost(Post post)
-        {
-            post.Datetime = DateTime.Now;
-            _database.Posts.Add(post);
-            _database.SaveChanges();
-            
-            return Redirect("/Home/Posts");
-        }
-
-        private void RedirectNotInitializedUser()
-        {
-            if (Session["userId"] == null)
-                Redirect("/Home/Sign");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿@using AssetManagerServer.Models
+﻿@using System.Data.Entity
+@using AssetManagerServer.Models
 @model dynamic
 
 @{
@@ -8,82 +9,51 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <link rel="stylesheet"
-              href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
-              integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
-              crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Профиль</title>
-</head>
 <body>
 <div>
-    <table class="pure-table pure-table-bordered">
+    <table class="pure-table pure-table-bordered" id="screenCenter">
         <tr>
-            <td>
-                <b>Актив</b></td>
-            <td>
-                <b>Тикер актива</b></td>
-            <td>
-                <b>Тип актива</b></td>
-            <td>
-                <b>Брокер</b></td>
-            <td>
-                <b>Кол-во активов</b></td>
-            <td>
-                <b>Привлекательность покупки</b></td>
-            <td>
-                <b>Привлекательность продажи</b></td>
-            <td></td>
-            <td></td>
+            <th>Актив</th>
+            <th>Тикер актива</th>
+            <th>Тип актива</th>
+            <th>Брокер</th>
+            <th>Кол-во активов</th>
+            <th>Привлекательность покупки</th>
+            <th>Привлекательность продажи</th>
+            <th></th>
+            <th></th>
         </tr>
         @{
-            var operations = new List<Operation>();
-            foreach (var o in ViewBag.Operations)
-            {
-                operations.Add(new Operation(o as Operation));
-            }
+            var operations = (ViewBag.Operations as DbSet<Operation>)?.ToList();
+            var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
+            var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList();
 
-            var brokers = new List<Broker>();
-            foreach (var broker in ViewBag.Brokers)
+            if (operations == null || brokers == null || assetAnalytics == null)
             {
-                brokers.Add(new Broker(broker as Broker));
+                throw new NullReferenceException("При конвертации один из списков данных оказался NULL");
             }
-
-            var assetAnalytics = new List<AssetAnalytic>();
-            foreach (var analytic in ViewBag.AssetAnalytics)
-            {
-                assetAnalytics.Add(new AssetAnalytic(analytic as AssetAnalytic));
-            }
-
+            
             var curUserId = int.Parse(Session["userId"].ToString());
             var operationsCurrentUser = operations.Where(o => o.UserId == curUserId);
-        }
-        @foreach (var operationGroup in operationsCurrentUser.GroupBy(operation => operation.AssetName))
-        {
-            var assetCount = operationGroup.Sum(operation => operation.Type);
-            <tr>
-                <td>
-                    <p>@(operationGroup.FirstOrDefault()?.AssetName)</p></td>
-                <td>
-                    <p>@(operationGroup.FirstOrDefault()?.AssetTicker)</p></td>
-                <td>
-                    <p>@(operationGroup.FirstOrDefault()?.AssetType)</p></td>
-                <td>
-                    <p>@(brokers.FirstOrDefault(broker => broker.Id == operationGroup.FirstOrDefault()?.BrokerId)?.Name)</p></td>
-                <td><p>@assetCount</p></td>
-                @{
-                    var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operationGroup.First().AssetAnalyticId);
-                    <td>
-                        <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</p></td>
-                    <td>
-                        <p>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</p></td>
-                    <td>
-                        <a href="/Home/AddAsset?operationId=@(operationGroup.FirstOrDefault()?.Id)">Купить</a></td>
-                    <td>
-                        <a href="/Home/DeleteAsset?operationId=@(operationGroup.FirstOrDefault()?.Id)">Продать</a></td>
-                }
-            </tr>
+            var operationGroups = operationsCurrentUser.GroupBy(operation => 
+                (operation.AssetName, operation.AssetTicker, operation.AssetType));
+
+            foreach (var operationGroup in operationGroups)
+            {
+                var assetCount = operationGroup.Sum(operation => operation.Type);
+                var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operationGroup.First().AssetAnalyticId);
+                <tr>
+                    <td>@(operationGroup.FirstOrDefault()?.AssetName)</td>
+                    <td>@(operationGroup.FirstOrDefault()?.AssetTicker)</td>
+                    <td>@(operationGroup.FirstOrDefault()?.AssetType)</td>
+                    <td>@(brokers.FirstOrDefault(broker => broker.Id == operationGroup.FirstOrDefault()?.BrokerId)?.Name)</td>
+                    <td>@assetCount</td>
+                    <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</td>
+                    <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</td>
+                    <td><a href="/Home/AddAsset?operationId=@(operationGroup.FirstOrDefault()?.Id)">Купить</a></td>
+                    <td><a href="/Home/DeleteAsset?operationId=@(operationGroup.FirstOrDefault()?.Id)">Продать</a></td>
+                </tr>
+            }
         }
     </table>
 </div>
