@@ -11,9 +11,7 @@ namespace AssetManagerServer.Controllers
     public class HomeController : Controller
     {
         private readonly DataContext _database = new DataContext();
-        
-        private PrivacyValidator _privacyValidator = new PrivacyValidator();
-        
+
         public ActionResult Index()
         {
             return Redirect("/Home/Sign");
@@ -22,91 +20,168 @@ namespace AssetManagerServer.Controllers
         [HttpGet]
         public ActionResult Sign(string notifyMessage = "")
         {
-            ViewBag.NotifyMessage = notifyMessage;
-            return View();
+            try
+            {
+                ViewBag.NotifyMessage = notifyMessage;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, -1, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
         
         [HttpPost]
         public ActionResult Sign(User user)
         {
-            var matchedUser = _database.Users.FirstOrDefault(curUser => curUser.Name == user.Name && curUser.Password == user.Password);
-
-            if (matchedUser != null)
+            try
             {
+                if (!PropertiesValidator.UsernameValidate(user.Name))
+                    return Redirect($"/Home/Sign?notifyMessage={Constants.Sign.WrongUsernameOrPassword}");
+
+                if (!PropertiesValidator.PasswordValidate(user.Password))
+                    return Redirect($"/Home/Sign?notifyMessage={Constants.Sign.WrongUsernameOrPassword}");
+
+                var matchedUser = _database.Users.FirstOrDefault(curUser =>
+                    curUser.Name == user.Name && curUser.Password == user.Password);
+
+                if (matchedUser == null)
+                    return Redirect($"/Home/Sign?notifyMessage={Constants.Sign.WrongUsernameOrPassword}");
+
                 Session["userId"] = matchedUser.Id;
                 return Redirect("/Home/Profile");
             }
-            else
+            catch (Exception e)
             {
-                return Redirect($"/Home/Sign?notifyMessage={Constants.Sign.WrongUsernameOrPassword}");
+                Logger.AddLog(e.Message, -1, HttpContext.Request, _database);
+                return HttpNotFound();
             }
+
         }
 
         [HttpGet]
         public ActionResult Register(string notifyMessage = "")
         {
-            ViewBag.NotifyMessage = notifyMessage;
-            return View();
+            try
+            {
+                ViewBag.NotifyMessage = notifyMessage;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, -1, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
-        
+
         [HttpPost]
         public ActionResult Register(RawUser rawUser)
         {
-            if (rawUser.Password != rawUser.PasswordAgain)
-                return Redirect($@"/Home/Register?notifyMessage={Constants.Register.WrongRepeatPassword}");
+            var userId = int.Parse(Session["userId"].ToString());
 
-            var users = _database.Users;
-            var matchedByNameUsers = users.Where(curUser => curUser.Name == rawUser.Name);
-
-            if (matchedByNameUsers.Any())
-                return Redirect($@"/Home/Register?notifyMessage={Constants.Register.UsernameNotAvailable}");
-            
-            var brokers = _database.Brokers;
-            var matchedBroker = brokers.FirstOrDefault(curBroker => curBroker.Name == rawUser.BrokerName);
-            if (matchedBroker == null)
+            try
             {
-                matchedBroker = new Broker {Name = rawUser.BrokerName};
-                brokers.Add(matchedBroker);
+                if (!PropertiesValidator.UsernameValidate(rawUser.Name))
+                    return Redirect($"/Home/Register?notifyMessage={Constants.Register.InvalidUsername}");
+
+                if (!PropertiesValidator.PasswordValidate(rawUser.Password))
+                    return Redirect($"/Home/Register?notifyMessage={Constants.Register.InvalidPassword}");
+
+                if (rawUser.Password != rawUser.PasswordAgain)
+                    return Redirect($@"/Home/Register?notifyMessage={Constants.Register.WrongRepeatPassword}");
+
+                var users = _database.Users;
+                var matchedByNameUsers = users.Where(curUser => curUser.Name == rawUser.Name);
+
+                if (matchedByNameUsers.Any())
+                    return Redirect($@"/Home/Register?notifyMessage={Constants.Register.UsernameNotAvailable}");
+
+                var brokers = _database.Brokers;
+                var matchedBroker = brokers.FirstOrDefault(curBroker => curBroker.Name == rawUser.BrokerName);
+                if (matchedBroker == null)
+                {
+                    matchedBroker = new Broker {Name = rawUser.BrokerName};
+                    brokers.Add(matchedBroker);
+                }
+
+                users.Add(new User {Name = rawUser.Name, Password = rawUser.Password, BrokerId = matchedBroker.Id});
+                _database.SaveChanges();
+
+                return Redirect($@"/Home/Sign");
             }
-
-            users.Add(new User {Name = rawUser.Name, Password = rawUser.Password, BrokerId = matchedBroker.Id});
-            _database.SaveChanges();
-
-            return Redirect($@"/Home/Sign");
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpGet]
-        public new ActionResult Profile()
+        public new ActionResult Profile(int sort = 4, bool asc = false)
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
-            
-            ViewBag.Operations = _database.Operations;
-            ViewBag.Brokers = _database.Brokers;
-            ViewBag.AssetAnalytics = _database.AssetAnalytics;
-            return View();
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                ViewBag.Sort = sort;
+                ViewBag.Asc = asc;
+                ViewBag.Operations = _database.Operations;
+                ViewBag.Brokers = _database.Brokers;
+                ViewBag.AssetAnalytics = _database.AssetAnalytics;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpGet]
-        public ActionResult Operations()
+        public ActionResult Operations(int sort = 4, bool asc = false)
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
             
-            ViewBag.Operations = _database.Operations;
-            ViewBag.Brokers = _database.Brokers;
-            ViewBag.AssetAnalytics = _database.AssetAnalytics;
-            return View();
+            try
+            {
+                ViewBag.Sort = sort;
+                ViewBag.Asc = asc;
+                ViewBag.Operations = _database.Operations;
+                ViewBag.Brokers = _database.Brokers;
+                ViewBag.AssetAnalytics = _database.AssetAnalytics;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
         
         [HttpGet]
-        public ActionResult Analytics()
+        public ActionResult Analytics(int sort = 0, bool asc = true)
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
-            
-            ViewBag.AssetAnalytics = _database.AssetAnalytics;
-            return View();
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                ViewBag.Sort = sort;
+                ViewBag.Asc = asc;
+                ViewBag.AssetAnalytics = _database.AssetAnalytics;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpGet]
@@ -114,20 +189,39 @@ namespace AssetManagerServer.Controllers
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
             
-            ViewBag.Posts = _database.Posts;
-            ViewBag.Users = _database.Users;
-            return View();
+            try
+            {
+                ViewBag.Posts = _database.Posts;
+                ViewBag.Users = _database.Users;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpPost]
         public ActionResult Posts(Post post)
         {
-            post.Datetime = DateTime.Now;
-            _database.Posts.Add(post);
-            _database.SaveChanges();
-            
-            return Redirect("/Home/Posts");
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                post.Datetime = DateTime.Now;
+                _database.Posts.Add(post);
+                _database.SaveChanges();
+
+                return Redirect("/Home/Posts");
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpGet]
@@ -135,9 +229,18 @@ namespace AssetManagerServer.Controllers
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
-            
-            ViewBag.NewsItems = _database.NewsItems;
-            return View();
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                ViewBag.NewsItems = _database.NewsItems;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpGet]
@@ -145,26 +248,50 @@ namespace AssetManagerServer.Controllers
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
             
-            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+            try
+            {
+                if (!PrivacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()),
+                    _database))
+                    if (operationId != -1)
+                        return HttpNotFound();
+
+                ViewBag.NotifyMessage = notifyMessage;
+                ViewBag.OperationId = operationId;
+                ViewBag.Operations = _database.Operations;
+                ViewBag.Brokers = _database.Brokers;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
                 return HttpNotFound();
-            
-            ViewBag.NotifyMessage = notifyMessage;
-            ViewBag.OperationId = operationId;
-            ViewBag.Operations = _database.Operations;
-            ViewBag.Brokers = _database.Brokers;
-            return View();
+            }
         }
 
         [HttpPost]
-        public RedirectResult AddAsset(RawOperation rawOperation)
+        public ActionResult AddAsset(RawOperation rawOperation)
         {
-            var (isValid, message) = rawOperation.Validate();
-            if (!isValid)
-                return Redirect($"/Home/AddAsset?operationId={rawOperation.OperationId}&notifyMessage={message}");
-            
-            rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()), 1);
-            return Redirect("/Home/Profile");
+            var userId = int.Parse(Session["userId"].ToString());
+            try
+            {
+                if (!PropertiesValidator.AssetTickerValidate(rawOperation.AssetTicker))
+                    return Redirect(
+                        $"/Home/AddAsset?operationId={rawOperation.OperationId}&notifyMessage={Constants.AddDeleteAsset.InvalidAssetTicker}");
+
+                if (!PropertiesValidator.DatetimeValidate(rawOperation.Datetime))
+                    return Redirect(
+                        $"/Home/AddAsset?operationId={rawOperation.OperationId}&notifyMessage={Constants.AddDeleteAsset.InvalidDatetime}");
+
+                rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()), 1);
+                return Redirect("/Home/Profile");
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
 
         [HttpGet]
@@ -172,26 +299,56 @@ namespace AssetManagerServer.Controllers
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
             
-            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+            try
+            {
+                if (!PrivacyValidator.IsUserHasOperation(operationId, userId, _database))
+                    return HttpNotFound();
+
+                ViewBag.NotifyMessage = notifyMessage;
+                ViewBag.OperationId = operationId;
+                ViewBag.Operations = _database.Operations;
+                ViewBag.Brokers = _database.Brokers;
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
                 return HttpNotFound();
-            
-            ViewBag.NotifyMessage = notifyMessage;
-            ViewBag.OperationId = operationId;
-            ViewBag.Operations = _database.Operations;
-            ViewBag.Brokers = _database.Brokers;
-            return View();
+            }
         }
         
         [HttpPost]
         public ActionResult DeleteAsset(RawOperation rawOperation)
         {
-            var (isValid, message) = rawOperation.Validate();
-            if (!isValid)
-                return Redirect($"/Home/AddAsset?operationId={rawOperation.OperationId}&notifyMessage={message}");
-            
-            rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()), -1);
-            return Redirect("/Home/Profile");
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                if (!PropertiesValidator.DatetimeValidate(rawOperation.Datetime))
+                    return Redirect(
+                        $"/Home/DeleteAsset?operationId={rawOperation.OperationId}&notifyMessage={Constants.AddDeleteAsset.InvalidDatetime}");
+
+                var operationsCurrentUser = _database.Operations.Where(o => o.UserId == userId).ToList();
+                var similarOperations = operationsCurrentUser.Where(operation =>
+                    rawOperation.AssetName == operation.AssetName &&
+                    rawOperation.AssetTicker == operation.AssetTicker &&
+                    rawOperation.AssetType == operation.AssetType);
+                var maxCount = similarOperations.Count();
+
+                if (rawOperation.Count > maxCount)
+                    return Redirect(
+                        $"/Home/DeleteAsset?operationId={rawOperation.OperationId}&notifyMessage={Constants.AddDeleteAsset.DeleteCountIsBig}");
+
+                rawOperation.SaveFormattedOperation(_database, int.Parse(Session["userId"].ToString()), -1);
+                return Redirect("/Home/Profile");
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
         }
         
         [HttpGet]
@@ -199,16 +356,26 @@ namespace AssetManagerServer.Controllers
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
-            
-            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                if (!PrivacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()),
+                    _database))
+                    return HttpNotFound();
+
+                var operations = _database.Operations.ToList();
+                var operationToCopy = operations.First(operation => operation.Id == operationId);
+                _database.Operations.Add(operationToCopy);
+                _database.SaveChanges();
+
+                return Redirect("/Home/Operations");
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
                 return HttpNotFound();
-            
-            var operations = _database.Operations.ToList();
-            var operationToCopy = operations.First(operation => operation.Id == operationId);
-            _database.Operations.Add(operationToCopy);
-            _database.SaveChanges();
-            
-            return Redirect("/Home/Operations");
+            }
         }
 
         [HttpGet]
@@ -216,19 +383,28 @@ namespace AssetManagerServer.Controllers
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
             
-            if (!_privacyValidator.IsUserHasOperation(operationId, int.Parse(Session["userId"].ToString()), _database))
-                return HttpNotFound();
-            
-            var operationToDelete = _database.Operations.FirstOrDefault(o => o.Id == operationId);
+            try
+            {
+                if (!PrivacyValidator.IsUserHasOperation(operationId, userId, _database))
+                    return HttpNotFound();
 
-            if (operationToDelete == null)
+                var operationToDelete = _database.Operations.FirstOrDefault(o => o.Id == operationId);
+
+                if (operationToDelete == null)
+                    return HttpNotFound();
+
+                _database.Operations.Remove(operationToDelete);
+                _database.SaveChanges();
+
+                return Redirect("/Home/Operations");
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
                 return HttpNotFound();
-            
-            _database.Operations.Remove(operationToDelete);
-            _database.SaveChanges();
-            
-            return Redirect("/Home/Operations");
+            }
         }
     }
 }

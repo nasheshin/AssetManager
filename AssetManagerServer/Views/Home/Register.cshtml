@@ -11,10 +11,10 @@
 <div>
     <form method="post" action="" class="pure-form pure-form-aligned" id="screenCenter">
         <fieldset>
-            @Helpers.TextBoxPureStyled("Username", "Логин")
+            @Helpers.TextBoxPureStyled("Name", "Логин")
             @Helpers.TextBoxPureStyled("BrokerName", "Название брокера")
-            @Helpers.TextBoxPureStyled("Password", "Пароль")
-            @Helpers.TextBoxPureStyled("PasswordAgain", "Повторите пароль")
+            @Helpers.TextBoxPureStyled("Password", "Пароль", type:"password")
+            @Helpers.TextBoxPureStyled("PasswordAgain", "Повторите пароль", type:"password")
             @Helpers.ConfirmButtonPureStyled("Зарегистрироваться", @ViewBag.NotifyMessage)
         </fieldset>
     </form>

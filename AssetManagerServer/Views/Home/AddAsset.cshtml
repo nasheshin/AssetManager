@@ -15,24 +15,24 @@
     <form method="post" action="" class="pure-form pure-form-aligned" id="screenCenter">
         @{
             var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
-            
+
             if (brokers == null)
             {
                 throw new NullReferenceException(Constants.Exceptions.NullListGot);
             }
 
             var patternOperation = ViewBag.OperationId == -1
-                ? null : (ViewBag.Operations as DbSet<Operation>)?.FirstOrDefault(operation => operation.Id == ViewBag.OperationId);
+                ? null : (ViewBag.Operations as DbSet<Operation>)?.ToList().FirstOrDefault(operation => operation.Id == ViewBag.OperationId);
         }
         <fieldset>
             <input type="hidden" name="OperationId" value="@(ViewBag.OperationId)"/>
             @Helpers.TextBoxPureStyled("AssetName", "Название актива", @patternOperation?.AssetName)
             @Helpers.TextBoxPureStyled("AssetTicker", "Тикер актива", @patternOperation?.AssetTicker)
             @Helpers.TextBoxPureStyled("AssetType", "Тип актива", @patternOperation?.AssetType)
-            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки")
-            @Helpers.TextBoxPureStyled("Price", "Цена сделки")
+            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки", type: "date")
+            @Helpers.TextBoxPureStyled("Price", "Цена сделки", type: "number")
             @Helpers.TextBoxPureStyled("BrokerName", "Брокер", @brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)
-            @Helpers.TextBoxPureStyled("Count", "Кол-во")
+            @Helpers.TextBoxPureStyled("Count", "Кол-во", "1", "number")
             @Helpers.ConfirmButtonPureStyled("Купить", @ViewBag.NotifyMessage)
         </fieldset>
     </form>

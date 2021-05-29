@@ -11,29 +11,44 @@
 
 <html>
 <body>
+@{
+    var sort = ViewBag.Sort;
+    var asc = ViewBag.Asc;
+    
+    var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList().Select(x => x);
+
+    if (assetAnalytics == null)
+    {
+        throw new NullReferenceException(Constants.Exceptions.NullListGot);
+    }
+    
+    switch (sort)
+    {
+        case 0:
+            assetAnalytics = asc ? assetAnalytics.OrderBy(x => x.AssetName) : assetAnalytics.OrderByDescending(x => x.AssetName);
+            break;
+        case 1:
+            assetAnalytics = asc ? assetAnalytics.OrderBy(x => x.BuyRate) : assetAnalytics.OrderByDescending(x => x.BuyRate);
+            break;
+        case 2:
+            assetAnalytics = asc ? assetAnalytics.OrderBy(x => x.SellRate) : assetAnalytics.OrderByDescending(x => x.SellRate);
+            break;
+    }
+}
 <div>
     <table class="pure-table pure-table-bordered" id="screenCenter">
         <tr>
-            <th>Актив</th>
-            <th>Привлекательность покупки</th>
-            <th>Привлекательность продажи</th>
+            <th><a href="/Home/Analytics?sort=0&asc=@((!asc).ToString())">Актив</a></th>
+            <th><a href="/Home/Analytics?sort=0&asc=@((!asc).ToString())">Привлекательность покупки</a></th>
+            <th><a href="/Home/Analytics?sort=0&asc=@((!asc).ToString())">Привлекательность продажи</a></th>
         </tr>
-        @{
-            var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList();
-
-            if (assetAnalytics == null)
-            {
-                throw new NullReferenceException(Constants.Exceptions.NullListGot);
-            }
-
-            foreach (var analytic in assetAnalytics)
-            {
-                <tr>
-                    <td>@analytic.AssetName</td>
-                    <td>@analytic.BuyRate</td>
-                    <td>@analytic.SellRate</td>
-                </tr>
-            }
+        @foreach (var analytic in assetAnalytics)
+        {
+            <tr>
+                <td>@analytic.AssetName</td>
+                <td>@analytic.BuyRate</td>
+                <td>@analytic.SellRate</td>
+            </tr>
         }
     </table>
 </div>

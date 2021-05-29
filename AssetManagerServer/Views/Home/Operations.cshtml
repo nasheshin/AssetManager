@@ -11,46 +11,89 @@
 
 <html>
 <body>
+@{
+    var sort = ViewBag.Sort;
+    var asc = ViewBag.Asc;
+    
+    var operations = (ViewBag.Operations as DbSet<Operation>)?.ToList();
+    var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
+    var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList();
+
+    if (operations == null || brokers == null || assetAnalytics == null)
+    {
+        throw new NullReferenceException(Constants.Exceptions.NullListGot);
+    }
+
+    var curUserId = int.Parse(Session["userId"].ToString());
+    var operationsCurrentUser = operations.Where(o => o.UserId == curUserId).ToList();
+    
+    var convertedOperations = operationsCurrentUser.Select(o => new
+    {
+        o.AssetName, o.AssetTicker, o.AssetType, o.Datetime, OperationType = (o.Type == 1 ? "Покупка" : "Продажа"),
+        BrokerName = brokers.FirstOrDefault(broker => broker.Id == o.BrokerId)?.Name, o.Price,
+        assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.BuyRate,
+        assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.SellRate, o.Id
+    });
+    
+    switch (sort)
+    {
+        case 0:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.AssetName) : convertedOperations.OrderByDescending(x => x.AssetName);
+            break;
+        case 1:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.AssetTicker) : convertedOperations.OrderByDescending(x => x.AssetTicker);
+            break;
+        case 2:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.AssetType) : convertedOperations.OrderByDescending(x => x.AssetType);
+            break;
+        case 3:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.Datetime) : convertedOperations.OrderByDescending(x => x.Datetime);
+            break;
+        case 4:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.OperationType) : convertedOperations.OrderByDescending(x => x.OperationType);
+            break;
+        case 5:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.BrokerName) : convertedOperations.OrderByDescending(x => x.BrokerName);
+            break;
+        case 6:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.Price) : convertedOperations.OrderByDescending(x => x.Price);
+            break;
+        case 7:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.BuyRate) : convertedOperations.OrderByDescending(x => x.BuyRate);
+            break;
+        case 8:
+            convertedOperations = asc ? convertedOperations.OrderBy(x => x.SellRate) : convertedOperations.OrderByDescending(x => x.SellRate);
+            break;
+    }
+}
 <div>
     <table class="pure-table pure-table-bordered" id="screenCenter">
         <tr>
-            <th>Актив</th>
-            <th>Тикер актива</th>
-            <th>Тип актива</th>
-            <th>Дата сделки</th>
-            <th>Покупка/Продажа</th>
-            <th>Брокер</th>
-            <th>Цена сделки</th>
-            <th>Привлекательность покупки</th>
-            <th>Привлекательность продажи</th>
+            <th><a href="/Home/Operations?sort=0&asc=@((!asc).ToString())">Актив</a></th>
+            <th><a href="/Home/Operations?sort=1&asc=@((!asc).ToString())">Тикер актива</a></th>
+            <th><a href="/Home/Operations?sort=2&asc=@((!asc).ToString())">Тип актива</a></th>
+            <th><a href="/Home/Operations?sort=3&asc=@((!asc).ToString())">Дата сделки</a></th>
+            <th><a href="/Home/Operations?sort=4&asc=@((!asc).ToString())">Покупка/Продажа</a></th>
+            <th><a href="/Home/Operations?sort=5&asc=@((!asc).ToString())">Брокер</a></th>
+            <th><a href="/Home/Operations?sort=6&asc=@((!asc).ToString())">Цена сделки</a></th>
+            <th><a href="/Home/Operations?sort=7&asc=@((!asc).ToString())">Привлекательность покупки</a></th>
+            <th><a href="/Home/Operations?sort=8&asc=@((!asc).ToString())">Привлекательность продажи</a></th>
             <th></th>
             <th></th>
         </tr>
         @{
-            var operations = (ViewBag.Operations as DbSet<Operation>)?.ToList();
-            var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
-            var assetAnalytics = (ViewBag.AssetAnalytics as DbSet<AssetAnalytic>)?.ToList();
-
-            if (operations == null || brokers == null || assetAnalytics == null)
+            foreach (var operation in convertedOperations)
             {
-                throw new NullReferenceException(Constants.Exceptions.NullListGot);
-            }
-
-            var curUserId = int.Parse(Session["userId"].ToString());
-            var operationsCurrentUser = operations.Where(o => o.UserId == curUserId);
-            foreach (var operation in operationsCurrentUser)
-            {
-                var assetAnalytic = assetAnalytics.FirstOrDefault(analytic => analytic.Id == operation.AssetAnalyticId);
                 <tr>
                     <td>@operation.AssetName</td>
                     <td>@operation.AssetTicker</td>
                     <td>@operation.AssetType</td>
                     <td>@operation.Datetime.ToString("dd.MM.yyyy")</td>
-                    <td>@(operation.Type == 1 ? "Покупка" : "Продажа")</td>
-                    <td>@brokers.First(broker => broker.Id == operation.BrokerId).Name</td>
+                    <td>@operation.OperationType</td>
+                    <td>@operation.BrokerName</td>
                     <td>@operation.Price</td>
-                    <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.BuyRate.ToString())</td>
-                    <td>@(assetAnalytic == null ? "Неизвестно" : assetAnalytic.SellRate.ToString())</td>
+                    <td>@(operation.BuyRate == null ? "Неизвестно" : operation.BuyRate.ToString())</td>
+                    <td>@(operation.SellRate == null ? "Неизвестно" : operation.SellRate.ToString())</td>
                     <td><a href="/Home/CopyOperation?operationId=@(operation.Id)">Копировать</a></td>
                     <td><a href="/Home/DeleteOperation?operationId=@(operation.Id)">Удалить</a></td>
                 </tr>

@@ -22,7 +22,7 @@
             }
 
             var patternOperation = ViewBag.OperationId == -1
-                ? null : (ViewBag.Operations as DbSet<Operation>)?.FirstOrDefault(operation => operation.Id == ViewBag.OperationId);
+                ? null : (ViewBag.Operations as DbSet<Operation>)?.ToList().FirstOrDefault(operation => operation.Id == ViewBag.OperationId);
         }
         <fieldset>
             <input type="hidden" name="OperationId" value="@(ViewBag.OperationId)"/>
@@ -31,9 +31,9 @@
             <input type="hidden" name="AssetType" value="@(patternOperation?.AssetType)"/>
             <input type="hidden" name="BrokerName" value="@(brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)"/>
             <b>Актив @(patternOperation?.AssetName)</b><br/><br/>
-            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки")
-            @Helpers.TextBoxPureStyled("Price", "Цена сделки")
-            @Helpers.TextBoxPureStyled("Count", "Кол-во")
+            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки", type:"date")
+            @Helpers.TextBoxPureStyled("Price", "Цена сделки", type:"number")
+            @Helpers.TextBoxPureStyled("Count", "Кол-во", "1", "number")
             @Helpers.ConfirmButtonPureStyled("Продать", @ViewBag.NotifyMessage)
         </fieldset>
     </form>

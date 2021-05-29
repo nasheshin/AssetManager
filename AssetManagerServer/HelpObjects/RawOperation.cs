@@ -10,29 +10,15 @@ namespace AssetManagerServer.HelpObjects
         public string AssetName { get; set; }
         public string AssetTicker { get; set; }
         public string AssetType { get; set; }
-        public string Datetime { get; set; }
-        public string Price { get; set; }
+        public DateTime Datetime { get; set; }
+        public float Price { get; set; }
         public string BrokerName { get; set; }
-        public string Count { get; set; }
-
-        public Tuple<bool, string> Validate()
-        {
-            if (!DateTime.TryParse(Datetime, out _))
-                return new Tuple<bool, string>(false, "Неккоретно введена дата - попробуйте формат: 01.01.0001");
-            if (!float.TryParse(Price, out _))
-                return new Tuple<bool, string>(false, "Неккоректно введена цена сделки - проверьте не написали ли вы число через точку");
-            if (!int.TryParse(Count, out _))
-                return new Tuple<bool, string>(false, "Неверно введено кол-во активо, которые необходимо добавить");
-            return new Tuple<bool, string>(true, "Действие было произведено успешно");
-        }
+        public int Count { get; set; }
 
         public void SaveFormattedOperation(DataContext database, int userId, int type)
         {
             var assetNameLower = AssetName.ToLower();
             var brokerNameLower = BrokerName.ToLower();
-            var datetimeParsed = DateTime.Parse(Datetime);
-            var priceParsed = float.Parse(Price);
-            var countParsed = int.Parse(Count);
 
             var assetAnalytics = database.AssetAnalytics;
             var brokers = database.Brokers;
@@ -53,12 +39,12 @@ namespace AssetManagerServer.HelpObjects
                 brokerId = brokers.Last().Id;
             }
 
-            for (var i = 0; i < countParsed; i++)
+            for (var i = 0; i < Count; i++)
             {
                 database.Operations.Add(new Operation
                 {
-                    AssetName = AssetName, AssetTicker = AssetTicker, AssetType = AssetType, Datetime = datetimeParsed,
-                    Type = type, Price = priceParsed, UserId = userId, BrokerId = brokerId,
+                    AssetName = AssetName, AssetTicker = AssetTicker, AssetType = AssetType, Datetime = Datetime,
+                    Type = type, Price = Price, UserId = userId, BrokerId = brokerId,
                     AssetAnalyticId = assetAnalyticId
                 });
             }

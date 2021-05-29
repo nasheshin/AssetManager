@@ -10,5 +10,6 @@ namespace AssetManagerServer.Models
         public DbSet<Operation> Operations { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Log> Logs { get; set; }
     }
 }

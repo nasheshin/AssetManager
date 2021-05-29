@@ -1,4 +1,6 @@
-﻿@using AssetManagerServer.Models
+﻿@using System.Data.Entity
+@using AssetManagerServer.Models
+@using AssetManagerServer.Utils
 @model dynamic
 
 @{
@@ -9,11 +11,19 @@
 
 <html>
 <body>
+@{
+    var newsItems = (ViewBag.NewsItems as DbSet<NewsItem>)?.ToList();
+
+    if (newsItems == null)
+    {
+        throw new NullReferenceException(Constants.Exceptions.NullListGot);
+    }
+}
 <div>
     <table class="pure-table" id="screenCenter">
         @{
             var i = 0;
-            foreach (var newsItem in ViewBag.NewsItems)
+            foreach (var newsItem in newsItems.OrderByDescending(newsItem => newsItem.Datetime))
             {
                 <tr class="@(i == 0 ? "pure-table-odd" : "")">
                     @Helpers.SocialWebElement(newsItem.Header, newsItem.Datetime, newsItem.Text)

@@ -11,18 +11,29 @@
 
 <html>
 <body>
+@{
+    var users = (ViewBag.Users as DbSet<User>)?.ToList();
+    var posts = (ViewBag.Posts as DbSet<Post>)?.ToList();
+
+    if (users == null || posts == null)
+    {
+        throw new NullReferenceException(Constants.Exceptions.NullListGot);
+    }
+}
 <div>
+    <div>
+        <form method="post" action="" class="pure-form">
+            <fieldset>
+                <input type="hidden" name="UserId" value="@int.Parse(Session["userId"].ToString())"/>;
+                <textarea name="Text" style="width:300px;height:50px;"></textarea><br/>
+                @Helpers.ConfirmButtonPureStyled("Опубликовать", "")
+            </fieldset>
+        </form>
+    </div>
     <table class="pure-table" id="screenCenter">
         @{
-            var users = (ViewBag.Users as DbSet<User>)?.ToList();
-            
-            if (users == null)
-            {
-                throw new NullReferenceException(Constants.Exceptions.NullListGot);
-            }
-            
             var i = 0;
-            foreach (var post in ViewBag.Posts)
+            foreach (var post in posts.OrderByDescending(post => post.Datetime))
             {
                 <tr class="@(i == 0 ? "pure-table-odd" : "")">
                     @Helpers.SocialWebElement(users.First(user => user.Id == post.UserId).Name, post.Datetime, post.Text)
@@ -31,15 +42,6 @@
             }
         }
     </table>
-    <div>
-        <form method="post" action="" class="pure-form">
-            <fieldset>
-                <input type="hidden" name="UserId" value="@int.Parse(Session["userId"].ToString())"/>;
-                <textarea name="Text" style="width:250px;height:150px;">Писать тут...</textarea><br/>
-                @Helpers.ConfirmButtonPureStyled("Опубликовать", "")
-            </fieldset>
-        </form>
-    </div>
 </div>
 </body>
 </html>
