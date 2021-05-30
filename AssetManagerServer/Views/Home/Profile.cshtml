@@ -1,5 +1,6 @@
 ﻿@using System.Data.Entity
 @using AssetManagerServer.Models
+@using AssetManagerServer.Utils
 @model dynamic
 
 @{
@@ -23,45 +24,8 @@
         throw new NullReferenceException("При конвертации один из списков данных оказался NULL");
     }
 
-    var curUserId = int.Parse(Session["userId"].ToString());
-    var operationsCurrentUser = operations.Where(o => o.UserId == curUserId);
-    var operationGroups = operationsCurrentUser.GroupBy(operation =>
-        (operation.AssetName, operation.AssetTicker, operation.AssetType)).ToList();
-    
-    var portfolio = operationGroups.Select(g => new
-    {
-        AssetName = g.Key.Item1, AssetTicker = g.Key.Item2, AssetType = g.Key.Item3,
-        BrokerName = brokers.FirstOrDefault(broker => broker.Id == g.FirstOrDefault()?.BrokerId)?.Name,
-        Count = g.Sum(o => o.Type),
-        BuyRate = assetAnalytics.FirstOrDefault(analytic => analytic.Id == g.First().AssetAnalyticId)?.BuyRate,
-        SellRate = assetAnalytics.FirstOrDefault(analytic => analytic.Id == g.First().AssetAnalyticId)?.SellRate,
-        Id = g.FirstOrDefault()?.Id
-    });
-
-    switch (sort)
-    {
-        case 0:
-            portfolio = asc ? portfolio.OrderBy(x => x.AssetName) : portfolio.OrderByDescending(x => x.AssetName);
-            break;
-        case 1:
-            portfolio = asc ? portfolio.OrderBy(x => x.AssetTicker) : portfolio.OrderByDescending(x => x.AssetTicker);
-            break;
-        case 2:
-            portfolio = asc ? portfolio.OrderBy(x => x.AssetType) : portfolio.OrderByDescending(x => x.AssetType);
-            break;
-        case 3:
-            portfolio = asc ? portfolio.OrderBy(x => x.BrokerName) : portfolio.OrderByDescending(x => x.BrokerName);
-            break;
-        case 4:
-            portfolio = asc ? portfolio.OrderBy(x => x.Count) : portfolio.OrderByDescending(x => x.Count);
-            break;
-        case 5:
-            portfolio = asc ? portfolio.OrderBy(x => x.BuyRate) : portfolio.OrderByDescending(x => x.BuyRate);
-            break;
-        case 6:
-            portfolio = asc ? portfolio.OrderBy(x => x.SellRate) : portfolio.OrderByDescending(x => x.SellRate);
-            break;
-    }
+    var portfolio = ConvertingSortingUtils.ConvertSortPortfolio(
+        brokers, operations, assetAnalytics, sort, asc, int.Parse(Session["userId"].ToString()));
 }
 <div>
     <table class="pure-table pure-table-bordered" id="screenCenter">
@@ -69,7 +33,7 @@
             <th><a href="/Home/Profile?sort=0&asc=@((!asc).ToString())">Актив</a></th>
             <th><a href="/Home/Profile?sort=1&asc=@((!asc).ToString())">Тикер актива</a></th>
             <th><a href="/Home/Profile?sort=2&asc=@((!asc).ToString())">Тип актива</a></th>
-            <th><a href="/Home/Profile?sort=3&asc=@((!asc).ToString())">Брокер]</a></th>
+            <th><a href="/Home/Profile?sort=3&asc=@((!asc).ToString())">Брокер</a></th>
             <th><a href="/Home/Profile?sort=4&asc=@((!asc).ToString())">Кол-во активов</a></th>
             <th><a href="/Home/Profile?sort=5&asc=@((!asc).ToString())">Привлекательность покупки</a></th>
             <th><a href="/Home/Profile?sort=6&asc=@((!asc).ToString())">Привлекательность продажи</a></th>
@@ -84,8 +48,8 @@
                 <td>@element.AssetType</td>
                 <td>@element.BrokerName</td>
                 <td>@element.Count</td>
-                <td>@(element.BuyRate == null ? "Неизвестно" : element.BuyRate.ToString())</td>
-                <td>@(element.SellRate == null ? "Неизвестно" : element.SellRate.ToString())</td>
+                <td>@element.BuyRate</td>
+                <td>@element.SellRate.ToString()</td>
                 <td><a href="/Home/AddAsset?operationId=@element.Id">Купить</a></td>
                 <td><a href="/Home/DeleteAsset?operationId=@element.Id">Продать</a></td>
             </tr>

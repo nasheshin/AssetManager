@@ -31,6 +31,18 @@
             <li class="pure-menu-item">
                 <a href="/Home/AddAsset" class="pure-menu-link">Добавить актив</a>
             </li>
+            @if (ViewBag.IsExportPortfolio != null)
+            {
+                <li class="pure-menu-item">
+                    <a href="/Home/ExportPortfolio?sort=@(ViewBag.Sort)&asc=@(ViewBag.Asc)" class="pure-menu-link">Выгрузить портфель</a>
+                </li>
+            }
+            @if (ViewBag.IsExportOperations != null)
+            {
+                <li class="pure-menu-item">
+                    <a href="/Home/ExportOperations?sort=@(ViewBag.Sort)&asc=@(ViewBag.Asc)" class="pure-menu-link">Выгрузить операции</a>
+                </li>
+            }
         </ul>
     }
 </div>

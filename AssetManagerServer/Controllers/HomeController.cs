@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
@@ -118,7 +117,7 @@ namespace AssetManagerServer.Controllers
         }
 
         [HttpGet]
-        public new ActionResult Profile(int sort = 4, bool asc = false)
+        public ActionResult Profile(int sort = 4, bool asc = false)
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");
@@ -126,12 +125,40 @@ namespace AssetManagerServer.Controllers
 
             try
             {
+                ViewBag.IsExportPortfolio = true;
                 ViewBag.Sort = sort;
                 ViewBag.Asc = asc;
                 ViewBag.Operations = _database.Operations;
                 ViewBag.Brokers = _database.Brokers;
                 ViewBag.AssetAnalytics = _database.AssetAnalytics;
                 return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
+        }
+
+        [HttpGet]
+        public ActionResult ExportPortfolio(int sort = 4, bool asc = false)
+        {
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                var brokers = _database.Brokers.ToList();
+                var operations = _database.Operations.ToList();
+                var assetAnalytics = _database.AssetAnalytics.ToList();
+                var portfolio = ConvertingSortingUtils.ConvertSortPortfolio(
+                    brokers, operations, assetAnalytics, sort, asc, userId);
+
+                var (filePath, fileName) = ExportUtils.CreatePortfolioCsv(portfolio, userId);
+                var fileType = "application/csv";
+                
+                return File(filePath, fileType, fileName);
             }
             catch (Exception e)
             {
@@ -149,12 +176,40 @@ namespace AssetManagerServer.Controllers
             
             try
             {
+                ViewBag.IsExportOperations = true;
                 ViewBag.Sort = sort;
                 ViewBag.Asc = asc;
                 ViewBag.Operations = _database.Operations;
                 ViewBag.Brokers = _database.Brokers;
                 ViewBag.AssetAnalytics = _database.AssetAnalytics;
                 return View();
+            }
+            catch (Exception e)
+            {
+                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                return HttpNotFound();
+            }
+        }
+        
+        [HttpGet]
+        public ActionResult ExportOperations(int sort = 4, bool asc = false)
+        {
+            if (Session["userId"] == null)
+                return Redirect("/Home/Sign");
+            var userId = int.Parse(Session["userId"].ToString());
+
+            try
+            {
+                var brokers = _database.Brokers.ToList();
+                var operations = _database.Operations.ToList();
+                var assetAnalytics = _database.AssetAnalytics.ToList();
+                var convertedOperations = ConvertingSortingUtils.ConvertSortOperations(
+                    brokers, operations, assetAnalytics, sort, asc, userId);
+
+                var (filePath, fileName) = ExportUtils.CreateOperationsCsv(convertedOperations, userId);
+                var fileType = "application/csv";
+                
+                return File(filePath, fileType, fileName);
             }
             catch (Exception e)
             {

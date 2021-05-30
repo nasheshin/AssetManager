@@ -24,47 +24,8 @@
         throw new NullReferenceException(Constants.Exceptions.NullListGot);
     }
 
-    var curUserId = int.Parse(Session["userId"].ToString());
-    var operationsCurrentUser = operations.Where(o => o.UserId == curUserId).ToList();
-    
-    var convertedOperations = operationsCurrentUser.Select(o => new
-    {
-        o.AssetName, o.AssetTicker, o.AssetType, o.Datetime, OperationType = (o.Type == 1 ? "Покупка" : "Продажа"),
-        BrokerName = brokers.FirstOrDefault(broker => broker.Id == o.BrokerId)?.Name, o.Price,
-        assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.BuyRate,
-        assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.SellRate, o.Id
-    });
-    
-    switch (sort)
-    {
-        case 0:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.AssetName) : convertedOperations.OrderByDescending(x => x.AssetName);
-            break;
-        case 1:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.AssetTicker) : convertedOperations.OrderByDescending(x => x.AssetTicker);
-            break;
-        case 2:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.AssetType) : convertedOperations.OrderByDescending(x => x.AssetType);
-            break;
-        case 3:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.Datetime) : convertedOperations.OrderByDescending(x => x.Datetime);
-            break;
-        case 4:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.OperationType) : convertedOperations.OrderByDescending(x => x.OperationType);
-            break;
-        case 5:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.BrokerName) : convertedOperations.OrderByDescending(x => x.BrokerName);
-            break;
-        case 6:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.Price) : convertedOperations.OrderByDescending(x => x.Price);
-            break;
-        case 7:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.BuyRate) : convertedOperations.OrderByDescending(x => x.BuyRate);
-            break;
-        case 8:
-            convertedOperations = asc ? convertedOperations.OrderBy(x => x.SellRate) : convertedOperations.OrderByDescending(x => x.SellRate);
-            break;
-    }
+    var convertedOperations = ConvertingSortingUtils.ConvertSortOperations(
+        brokers, operations, assetAnalytics, sort, asc, int.Parse(Session["userId"].ToString()));
 }
 <div>
     <table class="pure-table pure-table-bordered" id="screenCenter">

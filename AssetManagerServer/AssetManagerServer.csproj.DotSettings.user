@@ -4,7 +4,9 @@
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CCOPYOPERATION/@EntryIndexedValue">Home\CopyOperation</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CDELETEASSET/@EntryIndexedValue">Home\DeleteAsset</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CDELETEOPERATION/@EntryIndexedValue">Home\DeleteOperation</s:String>
+	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CNEWS/@EntryIndexedValue">Home\News</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005COPERATIONS/@EntryIndexedValue">Home\Operations</s:String>
+	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CPOSTS/@EntryIndexedValue">Home\Posts</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CPROFILE/@EntryIndexedValue">Home\Profile</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=HOME_005CREGISTER/@EntryIndexedValue">Home\Register</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CADDASSET/@EntryIndexedValue">Home\AddAsset</s:String>
@@ -12,6 +14,8 @@
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CCOPYOPERATION/@EntryIndexedValue">Home\CopyOperation</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CDELETEASSET/@EntryIndexedValue">Home\DeleteAsset</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CDELETEOPERATION/@EntryIndexedValue">Home\DeleteOperation</s:String>
+	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CNEWS/@EntryIndexedValue">Home\News</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005COPERATIONS/@EntryIndexedValue">Home\Operations</s:String>
+	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CPOSTS/@EntryIndexedValue">Home\Posts</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CPROFILE/@EntryIndexedValue">Home\Profile</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=HOME_005CREGISTER/@EntryIndexedValue">Home\Register</s:String></wpf:ResourceDictionary>
