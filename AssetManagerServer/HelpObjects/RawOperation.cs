@@ -23,7 +23,7 @@ namespace AssetManagerServer.HelpObjects
             var assetAnalytics = database.AssetAnalytics;
             var brokers = database.Brokers;
 
-            var assetAnalyticId = -1;
+            var assetAnalyticId = 3;
             var assetAnalyticsMatched =
                 assetAnalytics.Where(analytic => analytic.AssetName.ToLower() == assetNameLower);
             if (assetAnalyticsMatched.Any())

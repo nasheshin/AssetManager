@@ -50,13 +50,14 @@ namespace AssetManagerServer.Utils
             var operationGroups = operationsCurrentUser.GroupBy(operation =>
                 (operation.AssetName, operation.AssetTicker, operation.AssetType)).ToList();
 
+            string tmp;
             var portfolio = operationGroups.Select(g => new PortfolioElement
             {
                 AssetName = g.Key.Item1, AssetTicker = g.Key.Item2, AssetType = g.Key.Item3,
                 BrokerName = brokers.FirstOrDefault(broker => broker.Id == g.FirstOrDefault()?.BrokerId)?.Name,
                 Count = g.Sum(o => o.Type),
-                BuyRate = assetAnalytics.FirstOrDefault(analytic => analytic.Id == g.First().AssetAnalyticId)?.BuyRate.ToString() ?? "Неизвестно",
-                SellRate = assetAnalytics.FirstOrDefault(analytic => analytic.Id == g.First().AssetAnalyticId)?.SellRate.ToString() ?? "Неизвестно",
+                BuyRate = (tmp = assetAnalytics.FirstOrDefault(analytic => analytic.Id == g.First().AssetAnalyticId)?.BuyRate.ToString()) == "-1" ? "Неизвестно" : tmp,
+                SellRate =(tmp = assetAnalytics.FirstOrDefault(analytic => analytic.Id == g.First().AssetAnalyticId)?.SellRate.ToString()) == "-1" ? "Неизвестно" : tmp,
                 Id = g.FirstOrDefault()?.Id
             });
 
@@ -101,13 +102,14 @@ namespace AssetManagerServer.Utils
         {
             var operationsCurrentUser = operations.Where(o => o.UserId == userId).ToList();
 
+            string tmp;
             var convertedOperations = operationsCurrentUser.Select(o => new OperationElement
             {
                 AssetName = o.AssetName, AssetTicker = o.AssetTicker, AssetType = o.AssetType, Datetime = o.Datetime,
                 OperationType = (o.Type == 1 ? "Покупка" : "Продажа"),
                 BrokerName = brokers.FirstOrDefault(broker => broker.Id == o.BrokerId)?.Name, Price = o.Price,
-                BuyRate = assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.BuyRate.ToString() ?? "Неизвестно",
-                SellRate = assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.SellRate.ToString() ?? "Неизвестно",
+                BuyRate = (tmp = assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.BuyRate.ToString()) == "-1" ? "Неизвестно" : tmp,
+                SellRate = (tmp = assetAnalytics.FirstOrDefault(analytic => analytic.Id == o.AssetAnalyticId)?.SellRate.ToString()) == "-1" ? "Неизвестно" : tmp,
                 Id = o.Id
             });
 

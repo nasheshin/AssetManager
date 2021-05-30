@@ -35,20 +35,23 @@
             break;
     }
 }
-<div>
-    <table class="pure-table pure-table-bordered" id="screenCenter">
+<div id="screenCenter">
+    <table class="pure-table pure-table-bordered">
         <tr>
             <th><a href="/Home/Analytics?sort=0&asc=@((!asc).ToString())">Актив</a></th>
-            <th><a href="/Home/Analytics?sort=0&asc=@((!asc).ToString())">Привлекательность покупки</a></th>
-            <th><a href="/Home/Analytics?sort=0&asc=@((!asc).ToString())">Привлекательность продажи</a></th>
+            <th><a href="/Home/Analytics?sort=1&asc=@((!asc).ToString())">Привлекательность покупки</a></th>
+            <th><a href="/Home/Analytics?sort=2&asc=@((!asc).ToString())">Привлекательность продажи</a></th>
         </tr>
         @foreach (var analytic in assetAnalytics)
         {
-            <tr>
-                <td>@analytic.AssetName</td>
-                <td>@analytic.BuyRate</td>
-                <td>@analytic.SellRate</td>
-            </tr>
+            if (analytic.AssetName != "Неизвестно")
+            {
+                <tr>
+                    <td>@analytic.AssetName</td>
+                    <td>@analytic.BuyRate</td>
+                    <td>@analytic.SellRate</td>
+                </tr>
+            }
         }
     </table>
 </div>

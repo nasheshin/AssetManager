@@ -19,8 +19,8 @@
         throw new NullReferenceException(Constants.Exceptions.NullListGot);
     }
 }
-<div>
-    <table class="pure-table" id="screenCenter">
+<div id="screenCenter">
+    <table class="pure-table">
         @{
             var i = 0;
             foreach (var newsItem in newsItems.OrderByDescending(newsItem => newsItem.Datetime))

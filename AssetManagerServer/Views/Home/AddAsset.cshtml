@@ -11,8 +11,8 @@
 
 <html>
 <body>
-<div>
-    <form method="post" action="" class="pure-form pure-form-aligned" id="screenCenter">
+<div id="screenCenter">
+    <form method="post" action="" class="pure-form pure-form-aligned">
         @{
             var brokers = (ViewBag.Brokers as DbSet<Broker>)?.ToList();
 
@@ -29,7 +29,7 @@
             @Helpers.TextBoxPureStyled("AssetName", "Название актива", @patternOperation?.AssetName)
             @Helpers.TextBoxPureStyled("AssetTicker", "Тикер актива", @patternOperation?.AssetTicker)
             @Helpers.TextBoxPureStyled("AssetType", "Тип актива", @patternOperation?.AssetType)
-            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки", type: "date")
+            @Helpers.TextBoxPureStyled("Datetime", "Дата сделки", type: "date", value:DateTime.Now.ToString("yyyy-MM-dd"))
             @Helpers.TextBoxPureStyled("Price", "Цена сделки", type: "number")
             @Helpers.TextBoxPureStyled("BrokerName", "Брокер", @brokers.FirstOrDefault(broker => broker.Id == patternOperation?.BrokerId)?.Name)
             @Helpers.TextBoxPureStyled("Count", "Кол-во", "1", "number")

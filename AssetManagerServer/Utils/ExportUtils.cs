@@ -44,7 +44,7 @@ namespace AssetManagerServer.Utils
 
             using (var csvWriter = new StreamWriter(filePath))
             {
-                csvWriter.WriteLine($"Актив,Тикер,Тип,Дата,Операцтя,Брокер,Цена,Привлекательность покупки,Привлекательность продажи");
+                csvWriter.WriteLine($"Актив,Тикер,Тип,Дата,Операция,Брокер,Цена,Привлекательность покупки,Привлекательность продажи");
                 foreach (var element in operations)
                 {
                     csvWriter.WriteLine(element.ToString());

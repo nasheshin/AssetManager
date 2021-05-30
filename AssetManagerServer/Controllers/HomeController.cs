@@ -77,8 +77,6 @@ namespace AssetManagerServer.Controllers
         [HttpPost]
         public ActionResult Register(RawUser rawUser)
         {
-            var userId = int.Parse(Session["userId"].ToString());
-
             try
             {
                 if (!PropertiesValidator.UsernameValidate(rawUser.Name))
@@ -111,7 +109,7 @@ namespace AssetManagerServer.Controllers
             }
             catch (Exception e)
             {
-                Logger.AddLog(e.Message, userId, HttpContext.Request, _database);
+                Logger.AddLog(e.Message, -1, HttpContext.Request, _database);
                 return HttpNotFound();
             }
         }
@@ -168,7 +166,7 @@ namespace AssetManagerServer.Controllers
         }
 
         [HttpGet]
-        public ActionResult Operations(int sort = 4, bool asc = false)
+        public ActionResult Operations(int sort = 3, bool asc = false)
         {
             if (Session["userId"] == null)
                 return Redirect("/Home/Sign");

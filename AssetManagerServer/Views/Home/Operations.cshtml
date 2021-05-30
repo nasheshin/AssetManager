@@ -27,8 +27,8 @@
     var convertedOperations = ConvertingSortingUtils.ConvertSortOperations(
         brokers, operations, assetAnalytics, sort, asc, int.Parse(Session["userId"].ToString()));
 }
-<div>
-    <table class="pure-table pure-table-bordered" id="screenCenter">
+<div id="screenCenter">
+    <table class="pure-table pure-table-bordered">
         <tr>
             <th><a href="/Home/Operations?sort=0&asc=@((!asc).ToString())">Актив</a></th>
             <th><a href="/Home/Operations?sort=1&asc=@((!asc).ToString())">Тикер актива</a></th>

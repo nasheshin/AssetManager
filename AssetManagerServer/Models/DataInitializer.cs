@@ -32,25 +32,25 @@ namespace AssetManagerServer.Models
             {
                 AssetName = "Сбербанк", AssetTicker = "SBER", AssetType = "Акция",
                 Datetime = new DateTime(2021, 04, 10), Type = 1, Price = 300, UserId = 1, BrokerId = 1,
-                AssetAnalyticId = -1
+                AssetAnalyticId = 3
             });
             database.Operations.Add(new Operation
             {
                 AssetName = "Сбербанк", AssetTicker = "SBER", AssetType = "Акция",
                 Datetime = new DateTime(2021, 03, 10), Type = -1, Price = 500, UserId = 1, BrokerId = 1,
-                AssetAnalyticId = -1
+                AssetAnalyticId = 3
             });
             database.Operations.Add(new Operation
             {
                 AssetName = "Сбербанк", AssetTicker = "SBER", AssetType = "Акция",
                 Datetime = new DateTime(2021, 02, 10), Type = 1, Price = 400, UserId = 1, BrokerId = 1,
-                AssetAnalyticId = -1
+                AssetAnalyticId = 3
             });
             database.Operations.Add(new Operation
             {
-                AssetName = "ФБК", AssetTicker = "FFCN", AssetType = "Фонд",
+                AssetName = "FinEx China UCITS ETF", AssetTicker = "FXCN", AssetType = "Фонд",
                 Datetime = new DateTime(2021, 02, 10), Type = 1, Price = 10, UserId = 1, BrokerId = 1,
-                AssetAnalyticId = -1
+                AssetAnalyticId = 3
             });
             database.Operations.Add(new Operation
             {
@@ -62,17 +62,18 @@ namespace AssetManagerServer.Models
             // Инициализация аналитики
             database.AssetAnalytics.Add(new AssetAnalytic {AssetName = "ПермЭнергоСбыт", BuyRate = 2, SellRate = 7});
             database.AssetAnalytics.Add(new AssetAnalytic {AssetName = "МТС", BuyRate = 7, SellRate = 2});
+            database.AssetAnalytics.Add(new AssetAnalytic {AssetName = "Неизвестно", BuyRate = -1, SellRate = -1});
 
             // Инициализация постов
             database.Posts.Add(new Post
             {
-                Text = "Офигеть, как много денег я зработал за сегодня!!!!!",
+                Text = "Всем привет!",
                 Datetime = new DateTime(2021, 05, 23, 14, 1, 57),
                 UserId = 1
             });
             database.Posts.Add(new Post
             {
-                Text = "Блин, а я тольк все потерял((((",
+                Text = "Здравствуй!)",
                 Datetime = new DateTime(2021, 05, 23, 14, 10, 00),
                 UserId = 2
             });

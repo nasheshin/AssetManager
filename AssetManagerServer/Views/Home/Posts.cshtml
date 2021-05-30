@@ -9,7 +9,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <body>
 @{
     var users = (ViewBag.Users as DbSet<User>)?.ToList();
@@ -21,27 +21,27 @@
     }
 }
 <div>
-    <div>
-        <form method="post" action="" class="pure-form">
-            <fieldset>
-                <input type="hidden" name="UserId" value="@int.Parse(Session["userId"].ToString())"/>;
-                <textarea name="Text" style="width:300px;height:50px;"></textarea><br/>
-                @Helpers.ConfirmButtonPureStyled("Опубликовать", "")
-            </fieldset>
-        </form>
-    </div>
-    <table class="pure-table" id="screenCenter">
-        @{
-            var i = 0;
-            foreach (var post in posts.OrderByDescending(post => post.Datetime))
-            {
-                <tr class="@(i == 0 ? "pure-table-odd" : "")">
-                    @Helpers.SocialWebElement(users.First(user => user.Id == post.UserId).Name, post.Datetime, post.Text)
-                </tr>
-                i++;
+    <form method="post" action="" class="pure-form" id="screenCenter">
+        <fieldset>
+            <input type="hidden" name="UserId" value="@int.Parse(Session["userId"].ToString())"/>
+            <textarea name="Text" style="width:300px;height:30px;"></textarea>
+            @Helpers.ConfirmButtonPureStyled("Опубликовать", "")
+        </fieldset>
+    </form>
+    <div id="screenCenter">
+        <table class="pure-table">
+            @{
+                var i = 0;
+                foreach (var post in posts.OrderByDescending(post => post.Datetime))
+                {
+                    <tr class="@(i == 0 ? "pure-table-odd" : "")">
+                        @Helpers.SocialWebElement(users.First(user => user.Id == post.UserId).Name, post.Datetime, post.Text)
+                    </tr>
+                    i++;
+                }
             }
-        }
-    </table>
+        </table>
+    </div>
 </div>
 </body>
 </html>
