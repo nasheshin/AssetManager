@@ -1,2 +1,20 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:Boolean x:Key="/Default/Environment/Hierarchy/EntityFrameworkOptions/IsAlreadyNotifiedAboutEntityFramework/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/Environment/Hierarchy/EntityFrameworkOptions/IsAlreadyNotifiedAboutEntityFramework/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0550631a_002D31a5_002D4dbf_002Da3ba_002D9c865d65b679/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="DeleteAssetTestViewBag" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::AD438E16-A59D-4F87-9331-8856153D2707::.NETFramework,Version=v4.7.2::UnitTesting.Tests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=802234a9_002Df992_002D4e24_002Dbc03_002Dc21c16fe9de6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="RegisterTestNotifyMessageNotEmpty" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::AD438E16-A59D-4F87-9331-8856153D2707::.NETFramework,Version=v4.7.2::UnitTesting.Tests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d1dc36f6_002Dc4aa_002D4b2d_002Da1ff_002D8aae633be12c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::AD438E16-A59D-4F87-9331-8856153D2707::.NETFramework,Version=v4.7.2::UnitTesting.Tests.SignTestNotifyMessageEmpty&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::AD438E16-A59D-4F87-9331-8856153D2707::.NETFramework,Version=v4.7.2::UnitTesting.Tests.SignTestNotifyMessageNotEmpty&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::AD438E16-A59D-4F87-9331-8856153D2707::.NETFramework,Version=v4.7.2::UnitTesting.Tests.RegisterTestNotifyMessageEmpty&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/SpawnedProcessesKnownList/=sqlservr_002Eexe/@EntryIndexedValue">KillOrphaned</s:String></wpf:ResourceDictionary>

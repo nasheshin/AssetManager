@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using AssetManagerServer.HelpObjects;
 using AssetManagerServer.Models;
@@ -11,6 +13,17 @@ namespace AssetManagerServer.Controllers
     {
         private readonly DataContext _database = new DataContext();
 
+        public HomeController(HttpContextBase context)
+        {
+            ControllerContext = new ControllerContext {HttpContext = context};
+            Database.SetInitializer(new TestDataInitializer());
+        }
+        
+        public HomeController()
+        {
+            
+        }
+        
         public ActionResult Index()
         {
             return Redirect("/Home/Sign");
@@ -22,7 +35,7 @@ namespace AssetManagerServer.Controllers
             try
             {
                 ViewBag.NotifyMessage = notifyMessage;
-                return View();
+                return View("Sign");
             }
             catch (Exception e)
             {
@@ -264,6 +277,9 @@ namespace AssetManagerServer.Controllers
 
             try
             {
+                if (post.Text == null) 
+                    return Redirect("/Home/Posts");
+                
                 post.Datetime = DateTime.Now;
                 _database.Posts.Add(post);
                 _database.SaveChanges();
